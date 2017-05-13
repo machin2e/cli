@@ -10,8 +10,6 @@
 # This file can also be loaded as module to access the Builder API from a Python script.
 
 import argparse
-#import builder
-#import service
 from imports import *
 
 import petname
@@ -48,25 +46,21 @@ def builder(command=None):
 	# TODO: stop broadcast
 	# TODO: stop discover
 	if args.command == "init":
-		if args.virtual == True: # builder init stoic-tomato
-			#name = petname.Generate(2)
-			#builder.init_virtual(name)
-			# builder init						Used to initialize this folder (assigns a default name).
-			# builder init -v					Used to create and init a VM (via Vagrant).
-			# builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
-			# builder init desktop				Used to init a Builder env called desktop.
-			builder.init_virtual(name=args.option1, virtual=args.virtual)
-		else:
-			builder.init(name=args.option1, virtual=args.virtual)
+		# Examples:
+		# builder init						Used to initialize this folder (assigns a default name).
+		# builder init -v					Used to create and init a VM (via Vagrant).
+		# builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
+		# builder init desktop				Used to init a Builder env called desktop.
+		init(name=args.option1, virtual=args.virtual)
 	elif args.command == "start":
 		if args.option1 == "broadcast":
 			service.broadcast()
 		elif args.option1 == "server":
-			builder.service.server()
+			service.server()
 	elif args.command == "ssh":
-		builder.ssh(args.option1)
+		ssh(args.option1)
 	elif args.command == "echo":
-		builder.echo(args.option1)
+		echo(args.option1)
 	elif args.command == "list":
 		# TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
 		# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
@@ -76,7 +70,7 @@ def builder(command=None):
 		list()
 	elif args.command == "configure":
 		pair = args.option1.split(':')
-		builder.configure(pair[0], pair[1])
+		configure(pair[0], pair[1])
 
 if __name__ == "__main__":
 	builder()
