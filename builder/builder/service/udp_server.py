@@ -1,3 +1,4 @@
+import os
 from socket import *
 
 def server():
@@ -51,7 +52,6 @@ def server():
 				serverSocket.sendto(response_message, address)
 
 			elif message.startswith('list'):
-				print "/list"
 				response_message = list2() # remove "echo " from start of string
 				print response_message
 				serverSocket.sendto(response_message, address)
@@ -64,7 +64,6 @@ def server():
 def list2():
 	builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
 	builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile')) # this will return current directory in which python file resides.
-
 	# Read the Builderfile
 	# TODO: Initialize the daemon here?
 	file = open(builderfile_path, 'r')
