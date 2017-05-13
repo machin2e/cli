@@ -51,6 +51,7 @@ def server():
 				serverSocket.sendto(response_message, address)
 
 			elif message.startswith('list'):
+				print "/list"
 				response_message = list2() # remove "echo " from start of string
 				print response_message
 				serverSocket.sendto(response_message, address)
