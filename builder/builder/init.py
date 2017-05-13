@@ -6,7 +6,9 @@
 # - UUID
 # - human-readable name
 
-import os.path
+import os
+import sys
+import subprocess
 import uuid
 import petname
 
@@ -17,21 +19,25 @@ def init(name=None, virtual=False):
 		init_physical(name, virtual)
 
 def init_physical(name=None, virtual=False):
-	print "PHYSICAL"
 	builderfile_path = './Builderfile'
 
 	# Create default Builderfile if it doesn't exist.
 	if not os.path.exists(builderfile_path):
+
 		file = open(builderfile_path, 'w')
 
 		# Write human-readable name
 		if name == None:
 			name = petname.Generate(2)
-		file.write("Name: %s\n" % name)
+		file.write("name: %s\n" % name)
 
 		# Write UUID
 		device_uuid = uuid.uuid4()
-		file.write("UUID: %s\n" % device_uuid)
+		file.write("uuid: %s\n" % device_uuid)
+
+		# Project UUID
+		project_uuid = None
+		file.write("project: %s\n" % project_uuid)
 
 		# Provider: builder, vagrant
 
@@ -46,13 +52,19 @@ def init_physical(name=None, virtual=False):
 		for i in range(len(filelines)):
 
 			# Read human-readable name 
-			if filelines[i].startswith('Name:'):
+			if filelines[i].startswith('name:'):
 				name = filelines[i].split(': ')[1]
 				#print filelines[i]
 				print name.replace('\n', '')
 
 			# Read UUID
-			if filelines[i].startswith('UUID:'):
+			if filelines[i].startswith('uuid:'):
+				device_uuid = filelines[i].split(': ')[1]
+				#print filelines[i]
+				print device_uuid.replace('\n', '')
+
+			# Read Project UUID
+			if filelines[i].startswith('project:'):
 				device_uuid = filelines[i].split(': ')[1]
 				#print filelines[i]
 				print device_uuid.replace('\n', '')
