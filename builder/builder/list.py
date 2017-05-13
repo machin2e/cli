@@ -26,10 +26,14 @@ def list():
 	current_time = 0
 	timeout = 2500
 
+	print "id\tname\ttype\tstate\tip"
 	while current_time - response_start_time < timeout:
 		try:
 			data, fromaddr = s.recvfrom(1000)
-			print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], data)
+			print "%s\t%s" % (data, fromaddr[0])
+
+			# TODO: create directories in builder_dir for the discovered VM if it doesn't already exist
+			#create_builer_folder(builder_name)
 		except:
 			None
 		current_time = int(round(time.time() * 1000))

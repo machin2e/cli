@@ -1,4 +1,5 @@
 import os
+import json
 from socket import *
 
 def server():
@@ -90,7 +91,13 @@ def list2():
 	#device_ip = socket.gethostbyname(socket.gethostname())
 
 	# Print the device listing
-	return "%s\t%s\t%s" % (device_name, device_uuid, device_ip)
+	#return "%s\t%s\t%s" % (device_name, device_uuid, device_ip)
+	list_dict = {
+		'name': device_name,
+		'uuid': device_uuid
+	}
+
+	return json.dumps(list_dict)
 
 
 if __name__ == "__main__":
