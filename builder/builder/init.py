@@ -17,6 +17,7 @@ def init(name=None, virtual=False):
 		init_physical(name, virtual)
 
 def init_physical(name=None, virtual=False):
+	print "PHYSICAL"
 	builderfile_path = './Builderfile'
 
 	# Create default Builderfile if it doesn't exist.
