@@ -61,7 +61,8 @@ def server():
 	serverSocket.close()
 
 def list2():
-	builderfile_path = './Builderfile'
+	builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
+	builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile')) # this will return current directory in which python file resides.
 
 	# Read the Builderfile
 	# TODO: Initialize the daemon here?
