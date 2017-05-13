@@ -7,6 +7,10 @@ setup(
 	author="Builder Network",
 	zip_safe=False,
 	packages=find_packages(),
+	install_requires = [
+		'petname',
+		'pexpect'
+	],
 	entry_points = {
 		'console_scripts': ['builder=builder.command_line:main'],
 	},
