@@ -120,8 +120,10 @@ def init_virtual(name=None, virtual=True):
 	file_lines.insert(3, '    v.name = "%s"\n' % name);
 	file_lines.insert(4, '  end\n');
 	file_lines.insert(5, '  config.vm.network "public_network"\n') # network
-	file_lines.insert(6, '  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use rsync, not vagrant)
-	file_lines.insert(7, '  config.vm.provision "shell", inline: "apt -y install git python-pip"') # device sync dir (TODO: use rsync, not vagrant)
+	#file_lines.insert(6, '  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use rsync, not vagrant)
+	file_lines.insert(6, '  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n') # device sync dir (TODO: use rsync, not vagrant)
+	file_lines.insert(7, '  config.vm.provision "shell", inline: "apt-get -y install git python-pip"\n') # device sync dir (TODO: use rsync, not vagrant)
+	file_lines.insert(8, '  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n') # device sync dir (TODO: use rsync, not vagrant)
 	#file_lines.insert(6, '  config.vm.synced_folder "../../../builder", "/builder/builder"\n') # builder CLI (should use git or package manager)
 
 	#file_lines.insert(6, '  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # synced folder

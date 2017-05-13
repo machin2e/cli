@@ -53,7 +53,6 @@ def server():
 			elif message.startswith('list'):
 				response_message = list2() # remove "echo " from start of string
 				print response_message
-				print 
 				serverSocket.sendto(response_message, address)
 
 		except:
