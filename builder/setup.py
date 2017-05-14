@@ -9,7 +9,9 @@ setup(
 	packages=find_packages(),
 	install_requires = [
 		'petname',
-		'pexpect'
+		'pexpect',
+		'psutil',
+		'portalocker'
 	],
 	entry_points = {
 		'console_scripts': ['builder=builder.command_line:main'],

@@ -1,6 +1,7 @@
 import os, sys, time
 import socket
 import uuid
+import json
 
 def list():
 	PORT = 4445
@@ -26,7 +27,7 @@ def list():
 	current_time = 0
 	timeout = 2500
 
-	print "id\tname\ttype\tstate\tip"
+	print "id\tname\towner\ttype\tstate\tlan ip\tmesh ip"
 	while current_time - response_start_time < timeout:
 		try:
 			data, fromaddr = s.recvfrom(1000)
@@ -34,15 +35,25 @@ def list():
 
 			# TODO: create directories in builder_dir for the discovered VM if it doesn't already exist
 			#create_builer_folder(builder_name)
+			create_builder_folder(data)
 		except:
 			None
 		current_time = int(round(time.time() * 1000))
 	s.close()
 
+def create_builder_folder(data):
+	data_dict = json.loads(data)
+
+	current_dir = os.getcwdu()
+
+	# Create builder folder if it doesn't exist
+	builder_dir = os.path.abspath(os.path.join(current_dir, data_dict['name']))
+	if not os.path.exists(builder_dir):
+		os.makedirs(builder_dir)
+
+
 def list2():
 	builderfile_path = './Builderfile'
-
-
 
 
 	# Read the Builderfile

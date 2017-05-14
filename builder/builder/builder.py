@@ -10,6 +10,7 @@
 # This file can also be loaded as module to access the Builder API from a Python script.
 
 from imports import *
+import os
 import argparse
 import petname
 
@@ -55,17 +56,24 @@ def builder(command=None):
 		clean()
 	elif args.command == "start":
 		if args.option1 == "broadcast":
-			service.broadcast()
-		elif args.option1 == "server":
-			service.server()
+			service.broadcast.start()
+		elif args.option1 == None:
+			# TODO: service.broadcast.start()
+			service.manager.start()
+	elif args.command == "run":
+		if args.option1 == "broadcast":
+			service.broadcast.run()
+		elif args.option1 == 'manager':
+			service.manager.run()
+	elif args.command == "stop":
+		if args.option1 == None:
+			service.manager.stop()
 	elif args.command == "ssh":
 		ssh(args.option1)
 	elif args.command == "echo":
 		echo(args.option1)
 	elif args.command == "list":
-		# TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
-		# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
-		# "IT'S ACTUALLY FUN TO PROGRAM BY JUMPING AROUND SEEING THE HIGHLIGHTED DEVICE SO YOU KNOW WHERE YOU'RE WORKING, AND SEEING HUD ON PHONE AND IN WINDOWS ON DESKTOP (SUMMONABLE/ASSIGNABLE VIA COMMAND LINE. SHOW UP AS SNAPPABLE WINDOWS. CAN SAVE AND CHANGE VIEWS WITH A COMMAND AS WELL. CAN MAKE ALWAYS ON TOP, TOO.).
+		# Examples:
 		# TODO: builder @fiery-fox start discovery
 		# TODO: builder start discovery @fiery-fox
 		list()
@@ -74,6 +82,10 @@ def builder(command=None):
 		# builder configure name:Michael
 		pair = args.option1.split(':')
 		configure(pair[0], pair[1])
+
+# TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
+# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
+# "IT'S ACTUALLY FUN TO PROGRAM BY JUMPING AROUND SEEING THE HIGHLIGHTED DEVICE SO YOU KNOW WHERE YOU'RE WORKING, AND SEEING HUD ON PHONE AND IN WINDOWS ON DESKTOP (SUMMONABLE/ASSIGNABLE VIA COMMAND LINE. SHOW UP AS SNAPPABLE WINDOWS. CAN SAVE AND CHANGE VIEWS WITH A COMMAND AS WELL. CAN MAKE ALWAYS ON TOP, TOO.).
 
 if __name__ == "__main__":
 	builder()

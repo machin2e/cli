@@ -2,8 +2,47 @@ import os
 import json
 from socket import *
 
-def server():
+def start():
+	print "Starting service."
+	current_file_path = os.getcwdu()
+	p = subprocess.Popen(['builder', 'start', 'manager'], cwd=current_file_path)
+	#p = subprocess.Popen(['builder', 'start', 'broadcast'], cwd=current_file_path)
+	print p.pid
+
+def stop():
+	current_dir = os.getcwd()
+	pidfile = os.path.join(current_dir, 'builder.pid')
+
+	with open(pidfile) as f:
+		content = f.readlines()
+	# you may also want to remove whitespace characters like `\n` at the end of each line
+	content = [x.strip() for x in content] 
+	print content
+
+	pid = int(content[0])
+	kill_proc_tree(pid)
+
+	# Delete the pidfile
+	os.remove(pidfile)
+
+def kill_proc_tree(pid, including_parent=True):    
+    parent = psutil.Process(pid)
+    children = parent.children(recursive=True)
+    for child in children:
+        child.kill()
+    gone, still_alive = psutil.wait_procs(children, timeout=5)
+    if including_parent:
+        parent.kill()
+        parent.wait(5)
+
+
+def run():
 	PORT = 4445
+
+	current_dir = os.getcwd()
+	pidfile = os.path.join(current_dir, 'builder.pid')
+	with open(pidfile, "w+") as f:
+		f.write('%s' % os.getpid())
 
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
 	serverSocket.bind(('', PORT))
@@ -101,4 +140,4 @@ def list2():
 
 
 if __name__ == "__main__":
-	server()
+	process()
