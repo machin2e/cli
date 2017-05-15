@@ -11,6 +11,7 @@ setup(
 		'petname',
 		'pexpect',
 		'psutil',
+		'netifaces',
 		'portalocker'
 	],
 	entry_points = {

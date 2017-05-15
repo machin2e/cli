@@ -1,22 +1,35 @@
-import os
+import os, sys
+import subprocess, psutil, tempfile, portalocker
 import json
-import subprocess
-import psutil
-import tempfile
-import portalocker
-from socket import *
+import socket
+import logging
+from ..util import util
+
+# Initialize logging
+current_dir = os.getcwdu()
+logfile_name = '%s.log' % __name__
+logfile_path = os.path.join(current_dir, logfile_name)
+logging.basicConfig(filename=logfile_path, level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
 def start():
-	print "Starting service."
-	current_file_path = os.getcwdu()
-	p = subprocess.Popen(['builder', 'run', 'manager'], cwd=current_file_path)
-	#p = subprocess.Popen(['builder', 'start', 'broadcast'], cwd=current_file_path)
-	print p.pid
+	sys.stdout.write('Starting manager service.')
+
+	current_dir = os.getcwdu()
+	p = subprocess.Popen(['builder', 'run', 'manager'], cwd=current_dir)
+	sys.stdout.write(' OK.\n')
+
+	# Log status
+	logging.info('Started manager service.')
 
 def stop():
+	sys.stdout.write('Stopping manager service.')
+
+	# Log status
+	logging.info('Stopped manager service.')
+
 	# Locate pidfile (if it exists)
 	current_dir = os.getcwd()
-	pidfile_path = os.path.join(tempfile.gettempdir(), 'builder.pid')
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
 
 	# Read pid from pidfile
 	pidfile = open(pidfile_path, "r")
@@ -27,26 +40,27 @@ def stop():
 	pid = int(content[0])
 
 	# Kill process
-	kill_proc_tree(pid)
+	util.kill_proc_tree(pid)
 
 	# Delete pidfile
 	os.remove(pidfile_path)
 
-def run():
-	PORT = 4445
+	sys.stdout.write(' OK.\n')
+
+def run(port=4445):
 
 	# Write pid into pidfile
 	current_dir = os.getcwd()
-	#pidfile = os.path.join(current_dir, 'builder.pid')
-	#pidfile = tempfile.NamedTemporaryFile()
-	pidfile_path = os.path.join(tempfile.gettempdir(), 'builder.pid') # create the pidfile
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
+	# TODO: get name of file for naming "builder.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
 	pidfile = open(pidfile_path, "w+")
 	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
 	pidfile.write('%s' % os.getpid())
 	pidfile.close()
 
-	serverSocket = socket(AF_INET, SOCK_DGRAM)
-	serverSocket.bind(('', PORT))
+	serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	serverSocket.bind(('', port))
 
 	response_timeout = 2.0 # seconds
 
@@ -62,6 +76,7 @@ def run():
 
 			if message.startswith("announce"):
 				print "Received:", message, "from", address
+				logging.info('Received: %s from %s' % (message, address))
 
 			elif message.startswith("configure"):
 				# e.g., "configuration key:value"
@@ -102,17 +117,6 @@ def run():
 
 	serverSocket.close()
 
-def kill_proc_tree(pid, including_parent=True):    
-    parent = psutil.Process(pid)
-    children = parent.children(recursive=True)
-    for child in children:
-        child.kill()
-    gone, still_alive = psutil.wait_procs(children, timeout=5)
-    if including_parent:
-        parent.kill()
-        parent.wait(5)
-
-
 def list2():
 	builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
 	builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile')) # this will return current directory in which python file resides.
@@ -149,7 +153,6 @@ def list2():
 	}
 
 	return json.dumps(list_dict)
-
 
 if __name__ == "__main__":
 	run()

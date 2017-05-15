@@ -57,16 +57,23 @@ def builder(command=None):
 	elif args.command == "start":
 		if args.option1 == "broadcast":
 			service.broadcast.start()
-		elif args.option1 == None:
-			# TODO: service.broadcast.start()
+		elif args.option1 == "manager":
 			service.manager.start()
+		elif args.option1 == None:
+			service.manager.start()
+			service.broadcast.start()
 	elif args.command == "run":
 		if args.option1 == "broadcast":
 			service.broadcast.run()
 		elif args.option1 == 'manager':
 			service.manager.run()
 	elif args.command == "stop":
+		if args.option1 == 'broadcast':
+			service.broadcast.stop()
+		elif args.option1 == 'manager':
+			service.manager.stop()
 		if args.option1 == None:
+			service.broadcast.stop()
 			service.manager.stop()
 	elif args.command == "ssh":
 		ssh(args.option1)
