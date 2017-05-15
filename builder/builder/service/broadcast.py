@@ -68,7 +68,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	#s.bind(('', 0))
 	s.bind(('', port))
-	#s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 	s.setblocking(0)
 	#s.settimeout(2)
@@ -90,10 +90,9 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 				#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], data)
 				message, fromaddr = s.recvfrom(1000)
 				if not fromaddr[0] in addresses:
-					print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
-
 					# Log status
 					logging.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
+					# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 			except:
 				None
 
