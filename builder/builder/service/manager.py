@@ -5,6 +5,10 @@ import socket
 import logging
 from ..util import util
 
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import SocketServer
+import urlparse
+
 # Initialize logging
 current_dir = os.getcwdu()
 logfile_name = '%s.log' % __name__
@@ -46,6 +50,101 @@ def stop():
 	os.remove(pidfile_path)
 
 	sys.stdout.write(' OK.\n')
+
+class S(BaseHTTPRequestHandler):
+	def _set_headers(self):
+		self.send_response(200)
+		self.send_header('Content-type', 'text/html')
+		self.end_headers()
+
+	# /status
+	# /announce
+	# /configure
+	# /echo
+	# /list
+	def do_GET(self):
+		parsed_path = urlparse.urlparse(self.path)
+
+		query_dict = urlparse.parse_qsl(urlparse.urlsplit(self.path).query)
+		#print query_dict
+
+		resource = parsed_path.path
+		query = parsed_path.query
+		#print "resource: %s" % resource
+		#print "query: %s" % query
+
+		if resource == '/status':
+
+			# Set headers
+			self.send_response(200)
+			self.send_header('Content-Type', 'application/json')
+			self.end_headers()
+
+			# Generate data structure
+			#builder_dir = os.path.abspath('/builder')
+			builder_dir = os.getcwd()
+			builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile'))
+
+			file = open(builderfile_path, 'r')
+			filelines = file.readlines()
+			file.close()
+
+			device_uuid = 'N/A'
+			device_name = 'N/A'
+			device_ip = 'N/A'
+
+			for i in range(len(filelines)):
+
+				# Read human-readable name 
+				if filelines[i].startswith('name:'):
+					device_name = filelines[i].split(': ')[1]
+					device_name = device_name.replace('\n', '')
+
+				# Read UUID
+				if filelines[i].startswith('uuid:'):
+					device_uuid = filelines[i].split(': ')[1]
+					device_uuid = device_uuid.replace('\n', '')
+
+			status = {
+				'name': device_name,
+				'uuid': device_uuid
+			}
+
+			# Generate JSON for data structure
+			status_json = json.dumps(status)
+
+			# Write response
+			self.wfile.write(status_json)
+
+		elif resource == '/info':
+			self._set_headers()
+			self.wfile.write("<html><body><h1>info</h1></body></html>")
+
+	def do_HEAD(self):
+		self._set_headers()
+																
+	def do_POST(self):
+		# Doesn't do anything with posted data
+		self._set_headers()
+		self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+
+def run2(server_class=HTTPServer, handler_class=S, port=80):
+
+	# Write pid into pidfile
+	current_dir = os.getcwd()
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
+	# TODO: get name of file for naming "builder.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
+	pidfile = open(pidfile_path, "w+")
+	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
+	pidfile.write('%s' % os.getpid())
+	pidfile.close()
+
+	# Start HTTP server
+	server_address = ('', port)
+	httpd = server_class(server_address, handler_class)
+	print 'Starting httpd...'
+	httpd.serve_forever()
 
 def run(port=4445):
 
