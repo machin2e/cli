@@ -10,10 +10,7 @@ import SocketServer
 import urlparse
 
 # Initialize logging
-current_dir = os.getcwdu()
-logfile_name = '%s.log' % __name__
-logfile_path = os.path.join(current_dir, logfile_name)
-logging.basicConfig(filename=logfile_path, level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logger = util.setup_log_folder(__name__)
 
 def start():
 	sys.stdout.write('Starting manager service.')
@@ -23,13 +20,13 @@ def start():
 	sys.stdout.write(' OK.\n')
 
 	# Log status
-	logging.info('Started manager service.')
+	logger.info('Started manager service.')
 
 def stop():
 	sys.stdout.write('Stopping manager service.')
 
 	# Log status
-	logging.info('Stopped manager service.')
+	logger.info('Stopped manager service.')
 
 	# Locate pidfile (if it exists)
 	current_dir = os.getcwd()
@@ -175,7 +172,7 @@ def run(port=4445):
 
 			if message.startswith("announce"):
 				print "Received:", message, "from", address
-				logging.info('Received: %s from %s' % (message, address))
+				logger.info('Received: %s from %s' % (message, address))
 
 			elif message.startswith("configure"):
 				# e.g., "configuration key:value"

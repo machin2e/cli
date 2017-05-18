@@ -77,6 +77,8 @@ def builder(command=None):
 			service.manager.stop()
 	elif args.command == "ssh":
 		ssh(args.option1)
+	elif args.command == "sync":
+		sync(args.option1)
 	elif args.command == "echo":
 		echo(args.option1)
 	elif args.command == "list":

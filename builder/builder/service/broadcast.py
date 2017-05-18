@@ -8,10 +8,7 @@ import logging
 from ..util import util
 
 # Initialize logging
-current_dir = os.getcwdu()
-logfile_name = '%s.log' % __name__
-logfile_path = os.path.join(current_dir, logfile_name)
-logging.basicConfig(filename=logfile_path, level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logger = util.setup_log_folder(__name__)
 
 def start():
 	sys.stdout.write('Starting broadcast service.')
@@ -20,13 +17,13 @@ def start():
 	sys.stdout.write(' OK.\n')
 
 	# Log status
-	logging.info('Started broadcast service.')
+	logger.info('Started broadcast service.')
 
 def stop():
 	sys.stdout.write('Stopping broadcast service.')
 
 	# Log status
-	logging.info('Stopped broadcast service.')
+	logger.info('Stopped broadcast service.')
 
 	# Locate pidfile (if it exists)
 	current_dir = os.getcwd()
@@ -91,7 +88,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 				message, fromaddr = s.recvfrom(1000)
 				if not fromaddr[0] in addresses:
 					# Log status
-					logging.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
+					logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
 					# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 			except:
 				None
