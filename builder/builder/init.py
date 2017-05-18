@@ -74,7 +74,7 @@ def init_physical(name=None, virtual=False):
 def init_virtual(name=None, virtual=True):
 
 	current_file_path = os.getcwdu()
-	cwd = os.path.join(parent_directory, '.builder', 'vagrant')
+	#cwd = os.path.join(parent_directory, '.builder', 'vagrant')
 
 	# make "./.builder/vagrant" folder if doesn't exist
 	# make "./.builder/vagrant/<vm-name>" folder for generated name
@@ -120,7 +120,8 @@ def init_virtual(name=None, virtual=True):
 	lines.append('  config.vm.network "public_network"\n')
 	#lines.append('  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use rsync, not vagrant)
 	lines.append('  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n')
-	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev ptyprocess -y"\n')
+	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev -y"\n')
+	lines.append('  config.vm.provision "shell", inline: "sudo pip install ptyprocess"\n')
 	lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n')
 	lines.append('  config.vm.provision "shell", inline: "sudo pip install builder-python/builder"\n')
 
