@@ -114,14 +114,15 @@ def init_virtual(name=None, virtual=True):
 	last_lines = file_lines[2:]
 
 	lines = []
-	lines.append('  config.vm.provider "virtualbox" do |v|\n')
-	lines.append('    v.name = "%s"\n' % name)
-	lines.append('  end\n')
+	#lines.append('  config.vm.provider "virtualbox" do |v|\n')
+	#lines.append('    v.name = "%s"\n' % name)
+	#lines.append('  end\n')
 	lines.append('  config.vm.network "public_network"\n')
 	#lines.append('  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use rsync, not vagrant)
 	lines.append('  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n')
-	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev ptyprocess -y"\n') # device sync dir (TODO: use rsync, not vagrant)
-	lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n') # device sync dir (TODO: use rsync, not vagrant)
+	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev ptyprocess -y"\n')
+	lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n')
+	lines.append('  config.vm.provision "shell", inline: "sudo pip install builder-python/builder"\n')
 
 	file_lines = first_lines + lines + last_lines
 
