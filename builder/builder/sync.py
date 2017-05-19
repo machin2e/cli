@@ -20,8 +20,8 @@ def sync(name):
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	print cwd 
 	username = 'vagrant'
-	device_name = 'great-spider'
-	device_ip = '192.168.1.9'
+	device_name = name #device_name = 'great-spider' # TODO: Send message to great-spider to get its IP.
+	device_ip = '192.168.1.27'    # TODO: Use IP to log into the device.
 	process = subprocess.Popen(['unison', '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
 	                           stdout=subprocess.PIPE,
 							   stdin=subprocess.PIPE,

@@ -7,6 +7,7 @@ setup(
 	author="Builder Network",
 	zip_safe=False,
 	packages=find_packages(),
+	package_data = { 'builder': [ 'data/*' ] },
 	install_requires = [
 		'petname',
 		'pexpect',

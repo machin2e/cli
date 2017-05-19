@@ -118,12 +118,13 @@ def init_virtual(name=None, virtual=True):
 	#lines.append('    v.name = "%s"\n' % name)
 	#lines.append('  end\n')
 	lines.append('  config.vm.network "public_network"\n')
-	#lines.append('  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use rsync, not vagrant)
 	lines.append('  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n')
 	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev -y"\n')
 	lines.append('  config.vm.provision "shell", inline: "sudo pip install ptyprocess"\n')
 	lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n')
 	lines.append('  config.vm.provision "shell", inline: "sudo pip install builder-python/builder"\n')
+	lines.append('  config.vm.provision "shell", inline: "cd /builder && builder init %s"\n' % name)
+	#lines.append('  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use unison/git/rsync, not vagrant)
 
 	file_lines = first_lines + lines + last_lines
 
