@@ -13,13 +13,10 @@ from imports import *
 import os
 import argparse
 import petname
+import util
 
-import pkg_resources
-package_name = 'builder'
-DATA_PATH = pkg_resources.resource_filename(package_name, 'data/')
-print DATA_PATH
-DB_FILE = pkg_resources.resource_filename(package_name, 'data/Vagrantfile')
-print DB_FILE
+data_dir = util.get_data_dir()
+print data_dir
 
 def builder(command=None):
 

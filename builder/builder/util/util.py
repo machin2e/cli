@@ -2,6 +2,7 @@ import os
 import psutil
 import netifaces
 import logging
+import pkg_resources
 
 def kill_proc_tree(pid, including_parent=True):    
     parent = psutil.Process(pid)
@@ -54,6 +55,16 @@ def setup_log_folder(log_name):
 
 	#return logfile_path
 	return logger
+
+def get_data_dir():
+	data_dir = pkg_resources.resource_filename('builder', 'data/')
+	if not os.path.exists(data_dir):
+		return None
+	return data_dir
+
+def get_data_filename(filename):
+	return pkg_resources.resource_filename('builder', 'data/%s' % filename)
+
 
 def setup_builder_dir():
 	return None	
