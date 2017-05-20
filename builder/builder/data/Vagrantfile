@@ -1,34 +1,34 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/trusty64"
-  config.vm.network "public_network"
+	config.vm.box = "ubuntu/trusty64"
+	config.vm.network "public_network"
 
-  # Disable default synced folder to better simulate actual hardware.
-  config.vm.synced_folder '.', '/vagrant', disabled: true
+	# Disable default synced folder to better simulate actual hardware.
+	config.vm.synced_folder '.', '/vagrant', disabled: true
 
-  config.vm.provision "shell", inline: <<-SHELL
-  	# Update
-   	apt-get update -y
+	config.vm.provision "shell", inline: <<-SHELL
+		# Update
+		apt-get update -y
 
-	# Unison
-	add-apt-repository ppa:eugenesan/ppa
-	sudo apt-get update
-	sudo apt-get install unison
-	
-	# Python
-	apt-get install git python-pip python-dev -y
-	pip install ptyprocess
+		# Unison
+		add-apt-repository ppa:eugenesan/ppa
+		sudo apt-get update
+		sudo apt-get install unison
 
-	# Builder
-	git clone https://github.com/buildernetwork/builder-python
-	pip install builder-python/builder
+		# Python
+		apt-get install git python-pip python-dev -y
+		pip install ptyprocess
 
-	# Builder Environment
-	mkdir /builder && chown vagrant /builder
-  SHELL
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-	cd /builder
-	builder init saving-goat # TODO: INSERT NAME OF VM HERE
-	# builder start manager
-	builder start manager
-  SHELL
+		# Builder
+		git clone https://github.com/buildernetwork/builder-python
+		pip install builder-python/builder
+
+		# Builder Environment
+		mkdir /builder && chown vagrant /builder
+	SHELL
+	config.vm.provision "shell", privileged: false, inline: <<-SHELL
+		cd /builder
+		builder init %NAME%
+		# builder start manager
+		builder start manager
+	SHELL
 end

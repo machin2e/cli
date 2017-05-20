@@ -15,8 +15,12 @@ import argparse
 import petname
 import util
 
-data_dir = util.get_data_dir()
-print data_dir
+#data_dir = util.get_data_dir()
+#print data_dir
+
+# Load copy of Vagrantfile
+#vagrantfiledata = util.get_data_filename('Vagrantfile')
+#print open(vagrantfiledata).read().replace('%NAME%', 'foobar')
 
 def builder(command=None):
 

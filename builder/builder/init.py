@@ -6,11 +6,11 @@
 # - UUID
 # - human-readable name
 
-import os
-import sys
+import os, sys
 import subprocess
 import uuid
 import petname
+import util
 
 def init(name=None, virtual=False):
 	if virtual == True:
@@ -105,28 +105,33 @@ def init_virtual(name=None, virtual=True):
 	process = subprocess.Popen(['vagrant', 'init', '-m', vagrant_box], stdout=subprocess.PIPE, cwd=machine_folder, bufsize=1)
 	process.wait()
 
-	# Generate Vagrantfile
-	Vagrantfile = open(os.path.join(machine_folder, 'Vagrantfile'))
-	file_lines = Vagrantfile.readlines()
-	Vagrantfile.close()
-	
-	first_lines = file_lines[:2]
-	last_lines = file_lines[2:]
+	# Load copy of Vagrantfile
+	#vagrantfiledata = util.get_data_filename('Vagrantfile')
+	#print open(vagrantfiledata).read()
+	vagrantfile_data = util.get_vagrant_file(name)
 
-	lines = []
+	# Generate Vagrantfile
+	#Vagrantfile = open(os.path.join(machine_folder, 'Vagrantfile'))
+	#file_lines = Vagrantfile.readlines()
+	#Vagrantfile.close()
+	
+	#first_lines = file_lines[:2]
+	#last_lines = file_lines[2:]
+
+	#lines = []
 	#lines.append('  config.vm.provider "virtualbox" do |v|\n')
 	#lines.append('    v.name = "%s"\n' % name)
 	#lines.append('  end\n')
-	lines.append('  config.vm.network "public_network"\n')
-	lines.append('  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n')
-	lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev -y"\n')
-	lines.append('  config.vm.provision "shell", inline: "sudo pip install ptyprocess"\n')
-	lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n')
-	lines.append('  config.vm.provision "shell", inline: "sudo pip install builder-python/builder"\n')
-	lines.append('  config.vm.provision "shell", inline: "cd /builder && builder init %s"\n' % name)
+	#lines.append('  config.vm.network "public_network"\n')
+	#lines.append('  config.vm.provision "shell", inline: "mkdir /builder && chown vagrant /builder"\n')
+	#lines.append('  config.vm.provision "shell", inline: "apt-get install git python-pip python-dev -y"\n')
+	#lines.append('  config.vm.provision "shell", inline: "sudo pip install ptyprocess"\n')
+	#lines.append('  config.vm.provision "shell", inline: "git clone https://github.com/buildernetwork/builder-python"\n')
+	#lines.append('  config.vm.provision "shell", inline: "sudo pip install builder-python/builder"\n')
+	#lines.append('  config.vm.provision "shell", inline: "cd /builder && builder init %s"\n' % name)
 	#lines.append('  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # device sync dir (TODO: use unison/git/rsync, not vagrant)
 
-	file_lines = first_lines + lines + last_lines
+	#file_lines = first_lines + lines + last_lines
 
 	#file_lines.insert(2, '  config.vm.provider "virtualbox" do |v|\n') # machine name
 	#file_lines.insert(3, '    v.name = "%s"\n' % name)
@@ -140,8 +145,9 @@ def init_virtual(name=None, virtual=True):
 
 	#file_lines.insert(6, '  config.vm.synced_folder "../../../%s", "/builder"\n' % name) # synced folder
 	#file_lines.insert(7, '  config.vm.synced_folder "../../../builder", "/builder/builder", type: "rsync", rsync__args: ["--include=../../../builder.py"]\n')
-	Vagrantfile = open(os.path.join(machine_folder, 'Vagrantfile'), 'w')
-	Vagrantfile.writelines(file_lines)
+	Vagrantfile = open(os.path.join(machine_folder, 'Vagrantfile'), 'w+')
+	#Vagrantfile.writelines(file_lines)
+	Vagrantfile.write(vagrantfile_data)
 	Vagrantfile.close()
 
 	# TODO: CLI style where you enter high level commands with minimum info to start a interactive questionairre prompting for variable values (but with defaults assigned), also skippable, and if skipped, added to "todos".

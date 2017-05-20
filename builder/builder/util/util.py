@@ -65,7 +65,6 @@ def get_data_dir():
 def get_data_filename(filename):
 	return pkg_resources.resource_filename('builder', 'data/%s' % filename)
 
-
 def setup_builder_dir():
 	return None	
 
@@ -77,3 +76,9 @@ def get_parent_dir():
 
 def get_builder_dir():
 	return os.path.join(get_current_dir(), '.builder')
+
+# Load copy of Vagrantfile
+def get_vagrant_file(name):
+	vagrantfiledata = get_data_filename('Vagrantfile')
+	vagrantfiledata = open(vagrantfiledata).read().replace('%NAME%', name)
+	return vagrantfiledata
