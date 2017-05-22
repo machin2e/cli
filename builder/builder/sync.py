@@ -19,7 +19,7 @@ def sync(name, username='vagrant'):
 	device_ip = '192.168.1.31'    # TODO: Use IP to log into the device.
 
 	#process = subprocess.Popen(['unison', '-sshargs "-o StrictHostKeyChecking=no"', '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
-	process = subprocess.Popen(['unison', '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
+	process = subprocess.Popen(['unison', '-sshargs', '"-o StrictHostKeyChecking=no"', '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
 	                           stdout=subprocess.PIPE,
 							   stdin=subprocess.PIPE,
 							   shell=False,
