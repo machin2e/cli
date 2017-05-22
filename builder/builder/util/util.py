@@ -77,6 +77,10 @@ def get_parent_dir():
 def get_builder_dir():
 	return os.path.join(get_current_dir(), '.builder')
 
+# Load copy of file 
+def get_file(name):
+	return open(get_data_filename(name)).read().replace('%NAME%', name)
+
 # Load copy of Vagrantfile
 def get_vagrant_file(name):
 	vagrantfiledata = get_data_filename('Vagrantfile')
