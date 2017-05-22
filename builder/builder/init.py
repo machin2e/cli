@@ -47,8 +47,8 @@ def init_physical(name=None, virtual=False):
 		# Add insecure pre-shared SSH public key
 		# e.g., `cat public_key | cat >> ~/.ssh/authorized_keys`
 		#process = subprocess.Popen(['cat', 'public_key', '|', 'cat', '>>', '~/.ssh/authorized_keys'], stdout=subprocess.PIPE, cwd=util.get_current_dir(), bufsize=1)
-		process = subprocess.Popen(['cat public_key | cat >> ~/.ssh/authorized_keys'], stdout=subprocess.PIPE, cwd=util.get_current_dir(), bufsize=1)
-		process.wait()
+		#process.wait()
+		os.system('cat public_key | cat >> ~/.ssh/authorized_keys')
 
 
 	else:
