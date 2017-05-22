@@ -39,8 +39,8 @@ def list(name=None):
 			data, fromaddr = s.recvfrom(1000)
 			
 			response = json.loads(data)
-			sys.stdout.write("%s\t%s" % (response, fromaddr[0]))
-			sys.stdout.flush()
+			#sys.stdout.write("%s\t%s" % (response, fromaddr[0]))
+			#sys.stdout.flush()
 			if (response['name'] == name):
 				#print "%s\t%s" % (data, fromaddr[0])
 				s.close()
@@ -64,9 +64,7 @@ def sync(name, username='vagrant'):
 
 	# TODO: Cache this!
 	device_ip = list(name)
-	print "DEVICE:", device_ip
 
-	#process = subprocess.Popen(['unison', '-sshargs "-o StrictHostKeyChecking=no"', '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
 	process = subprocess.Popen(['unison', '-sshargs', "'-o StrictHostKeyChecking=no'", '-auto', '-batch', device_name, 'ssh://vagrant@%s//builder' % device_ip ], 
 	                           stdout=subprocess.PIPE,
 							   stdin=subprocess.PIPE,
