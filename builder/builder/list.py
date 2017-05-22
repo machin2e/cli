@@ -3,7 +3,7 @@ import socket
 import uuid
 import json
 
-def list():
+def list(name=None):
 	PORT = 4445
 
 	#device_uuid = uuid.uuid4()
@@ -31,7 +31,9 @@ def list():
 	while current_time - response_start_time < timeout:
 		try:
 			data, fromaddr = s.recvfrom(1000)
-			print "%s\t%s" % (data, fromaddr[0])
+			#print "%s\t%s" % (data, fromaddr[0])
+			sys.stdout.write("%s\t%s" % (data, fromaddr[0]))
+			sys.stdout.flush()
 
 			# TODO: create directories in builder_dir for the discovered VM if it doesn't already exist
 			#create_builer_folder(builder_name)

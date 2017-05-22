@@ -44,6 +44,7 @@ def init_physical(name=None, virtual=False):
 		file.close()
 
 
+		# TODO: Only do this for builder devices! Not dev machines!
 		# Add insecure pre-shared SSH public key
 		ssh_insecure_public_key = util.get_file('public_key')
 
