@@ -1,5 +1,7 @@
-import os
+import os, sys
 import psutil
+import socket, json
+import time
 import netifaces
 import logging
 import pkg_resources
@@ -86,3 +88,46 @@ def get_vagrant_file(name):
 	vagrantfiledata = get_data_filename('Vagrantfile')
 	vagrantfiledata = open(vagrantfiledata).read().replace('%NAME%', name)
 	return vagrantfiledata
+
+#
+# Networking
+#
+
+def request_ip_address(name=None):
+	PORT = 4445
+
+	broadcast_address = '192.168.1.255' # '<broadcast>'
+	response_timeout = 2.0 # seconds
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('', 0))
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+	# s.settimeout(response_timeout)
+	s.setblocking(0)
+
+	data = "list"
+	s.sendto(data, (broadcast_address, PORT)) # Works
+
+	response_start_time = int(round(time.time() * 1000))
+	current_time = 0
+	timeout = 2500
+
+	while current_time - response_start_time < timeout:
+		try:
+			data, fromaddr = s.recvfrom(1000)
+
+			# Deserialize JSON
+			response = json.loads(data)
+
+			# Check for matching device name. If it matches, return the IP address.
+			if (response['name'] == name):
+				#print "%s\t%s" % (data, fromaddr[0])
+				s.close()
+				return fromaddr[0]
+		except:
+			None
+		current_time = int(round(time.time() * 1000))
+	s.close()
+
+	return None

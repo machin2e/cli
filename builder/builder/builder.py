@@ -15,13 +15,6 @@ import argparse
 import petname
 import util
 
-#data_dir = util.get_data_dir()
-#print data_dir
-
-# Load copy of Vagrantfile
-#vagrantfiledata = util.get_data_filename('Vagrantfile')
-#print open(vagrantfiledata).read().replace('%NAME%', 'foobar')
-
 def builder(command=None):
 
 	# Define command-line argument parser
@@ -53,7 +46,15 @@ def builder(command=None):
 	# TODO: status discover
 	# TODO: stop broadcast
 	# TODO: stop discover
-	if args.command == "init":
+	if args.command == 'login':
+		None
+	elif args.command == 'logout':
+		None
+	elif args.command == 'signup':
+		None
+	elif args.command == 'whoami':
+		None
+	elif args.command == "init":
 		# Examples:
 		# builder init						Used to initialize this folder (assigns a default name).
 		# builder init -v					Used to create and init a VM (via Vagrant).
@@ -75,6 +76,8 @@ def builder(command=None):
 			service.broadcast.run()
 		elif args.option1 == 'manager':
 			service.manager.run()
+		elif args.option1 == 'monitor':
+			service.watchdir.run()
 	elif args.command == "stop":
 		if args.option1 == 'broadcast':
 			service.broadcast.stop()
@@ -83,6 +86,10 @@ def builder(command=None):
 		if args.option1 == None:
 			service.broadcast.stop()
 			service.manager.stop()
+	elif args.command == "up":
+		# TODO: turn on machine if it's not already up!
+		#ssh(args.option1)
+		None
 	elif args.command == "ssh":
 		ssh(args.option1)
 	elif args.command == "sync":
@@ -99,6 +106,34 @@ def builder(command=None):
 		# builder configure name:Michael
 		pair = args.option1.split(':')
 		configure(pair[0], pair[1])
+	elif args.command == 'add':
+		if args.option1 == 'app':
+			None
+		elif args.option1 == 'interface':
+			None # TODO: creates an interface directory with boilerplate configuration (if not specified in command), with file/folder structure
+		elif args.option1 == 'controller':
+			None
+		elif args.option1 == 'view':
+			None
+		elif args.option1 == 'shape':
+			None
+	elif args.command == 'jump': # goto : changes into the interfaces or specific interface folder (if specified)
+		if args.option1 == 'interface':
+			None
+	elif args.command == 'ls':
+		if args.option1 == 'app':
+			None
+		elif args.option1 == 'interface':
+			None
+		elif args.option1 == 'controller':
+			None
+		elif args.option1 == 'view':
+			None
+		elif args.option1 == 'shape':
+			None
+	elif args.command == 'rm':
+		if args.option1 == 'interface':
+			None
 
 # TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
 # TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.

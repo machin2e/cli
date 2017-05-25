@@ -8,6 +8,7 @@ from ..util import util
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 import urlparse
+import cgi
 
 # Initialize logging
 logger = util.setup_log_folder(__name__)
@@ -121,11 +122,71 @@ class S(BaseHTTPRequestHandler):
 		self._set_headers()
 																
 	def do_POST(self):
-		# Doesn't do anything with posted data
-		self._set_headers()
-		self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+		parsed_path = urlparse.urlparse(self.path)
 
-def run2(server_class=HTTPServer, handler_class=S, port=80):
+		#query_dict = urlparse.parse_qsl(urlparse.urlsplit(self.path).query)
+		#print query_dict
+
+		resource = parsed_path.path
+		query = parsed_path.query
+		#print "resource: %s" % resource
+		#print "query: %s" % query
+
+		if resource == '/state':
+
+			# Set headers
+			self.send_response(200)
+			self.send_header('Content-Type', 'application/json')
+			#self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
+			self.end_headers()
+
+			# Parse request
+			# Read request body and convert to dictionary.
+			request = {}
+			request['body'] = self.rfile.read(int(self.headers['Content-Length']))
+			request_dict = json.loads(request['body'])
+
+			# Process request
+			#builder_dir = os.path.abspath('/builder')
+			builder_dir = os.getcwd()
+			builderfile_path = os.path.abspath(os.path.join(builder_dir, 'db_state.json'))
+
+			# Load the record from database
+			db_dict = {}
+			file = open(builderfile_path, 'r+')
+			db_dict = json.loads(file.read())
+			file.close()
+
+			# Update the record 
+			for key in request_dict.keys():
+				db_dict[key] = request_dict[key]
+			db_dict_json = json.dumps(db_dict)
+
+			# Write updated database
+			file = open(builderfile_path, 'w+')
+			file.write(db_dict_json)
+			file.close()
+
+			# Generate response (with JSON)
+			response = {}
+			#file = open(builderfile_path, 'r+')
+			#response['body'] = file.read()
+			#file.close()
+			response['body'] = db_dict_json
+
+			#response_json = json.dumps(request_dict)
+
+			# Generate response (with JSON)
+			#status = {
+			#	'name': 'foo',
+			#	'uuid': 'bar' 
+			#}
+
+			# Write response
+			self.wfile.write('%s' % response['body'])
+
+def run(server_class=HTTPServer, handler_class=S, port=80):
+	sys.stdout.write('Starting httpd...\n')
 
 	# Write pid into pidfile
 	current_dir = os.getcwd()
@@ -143,7 +204,7 @@ def run2(server_class=HTTPServer, handler_class=S, port=80):
 	print 'Starting httpd...'
 	httpd.serve_forever()
 
-def run(port=4445):
+def run2(port=4445):
 
 	# Write pid into pidfile
 	current_dir = os.getcwd()
