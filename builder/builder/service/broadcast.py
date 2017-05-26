@@ -85,11 +85,11 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 			try:
 				#data, fromaddr = s.recvfrom(1000)
 				message, fromaddr = s.recvfrom(1000)
-				print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+				#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 				if not fromaddr[0] in addresses:
 					# Log status
 					logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
-					print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+					#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 
 					if message.startswith("announce"):
 						# Log status
@@ -97,7 +97,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 						# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string
-						print response_message
+						#print response_message
 						serverSocket.sendto(response_message, address)
 
 			except:
