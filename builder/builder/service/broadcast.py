@@ -13,7 +13,7 @@ logger = util.setup_log_folder(__name__)
 def start():
 	sys.stdout.write('Starting broadcast service.')
 	current_file_path = os.getcwdu()
-	p = subprocess.Popen(['builder', 'run', 'broadcast'], cwd=current_file_path)
+	p = subprocess.Popen(['builder', 'run', 'announce'], cwd=current_file_path)
 	sys.stdout.write(' OK.\n')
 
 	# Log status
@@ -84,12 +84,12 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 		while current_time - response_start_time < broadcast_timeout:
 			try:
 				#data, fromaddr = s.recvfrom(1000)
-				#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], data)
+				print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], data)
 				message, fromaddr = s.recvfrom(1000)
 				if not fromaddr[0] in addresses:
 					# Log status
 					#logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
-					# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+					#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 
 					if message.startswith("announce"):
 						# Log status
@@ -106,8 +106,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 
 			current_time = int(round(time.time() * 1000))
 
-		# Send periodic broadcast
-		s.sendto(broadcast_message, (broadcast_address, port)) # Works
+			# Send periodic broadcast
+			s.sendto(broadcast_message, (broadcast_address, port)) # Works
 
 	s.close()
 
