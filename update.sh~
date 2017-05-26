@@ -13,6 +13,6 @@ cd builder
 pip install .
 cd ..
 
-#git add *
-#git commit -m "Updated library."
-#git push
+git add *
+git commit -m "Updated library."
+git push
