@@ -58,7 +58,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	pidfile = open(pidfile_path, "w+")
 	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
 	pidfile.write('%s' % os.getpid())
-		pidfile.close()
+	pidfile.close()
 
 	device_uuid = uuid.uuid4()
 
