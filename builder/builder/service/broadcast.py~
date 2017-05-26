@@ -58,7 +58,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	pidfile = open(pidfile_path, "w+")
 	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
 	pidfile.write('%s' % os.getpid())
-        pidfile.close()
+		pidfile.close()
 
 	device_uuid = uuid.uuid4()
 
@@ -91,17 +91,18 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 					#logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
 					# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 
-                    if message.startswith("announce"):
-                        # Log status
-                        logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
-                        # print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+					if message.startswith("announce"):
+						# Log status
+						logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
+						# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+					elif message.startswith("echo"):
+						response_message = message[len("echo") + 1:] # remove "echo " from start of string
+						print response_message
+						serverSocket.sendto(response_message, address)
 
-                    elif message.startswith("echo"):
-                        response_message = message[len("echo") + 1:] # remove "echo " from start of string
-                        print response_message
-                        serverSocket.sendto(response_message, address)
-                        except:
-                            None
+			except:
+				# TODO: Log exception!
+				None
 
 			current_time = int(round(time.time() * 1000))
 
