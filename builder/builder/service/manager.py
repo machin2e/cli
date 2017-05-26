@@ -113,6 +113,25 @@ class S(BaseHTTPRequestHandler):
 
 		# Write response
 		self.wfile.write(status_json)
+
+	  elif resource == '/list':
+
+		# Set headers
+		self.send_response(200)
+		self.send_header('Content-Type', 'application/json')
+		self.end_headers()
+
+		# Generate response
+		listing_dict = generate_listing()
+		print '%s' % listing_dict
+
+		listing_dict_json = json.dumps(listing_dict, indent=4, sort_keys=False)
+
+		# Generate JSON for data structure
+		response_body = listing_dict_json
+
+		# Write response
+		self.wfile.write(response_body)
 		
 	  elif resource == '/state':
 
@@ -228,7 +247,7 @@ class S(BaseHTTPRequestHandler):
 		self.wfile.write('%s' % response['body'])
 
 def run(server_class=HTTPServer, handler_class=S, port=80):
-    sys.stdout.write('Starting httpd...\n')
+    print 'Starting HTTP server.'
 
     # Write pid into pidfile
     current_dir = os.getcwd()
@@ -243,7 +262,8 @@ def run(server_class=HTTPServer, handler_class=S, port=80):
     # Start HTTP server
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print 'Starting httpd...'
+
+    print ' OK.'
     httpd.serve_forever()
 
 def run2(port=4445):
@@ -277,37 +297,8 @@ def run2(port=4445):
 		    print "Received:", message, "from", address
 		    logger.info('Received: %s from %s' % (message, address))
 
-		elif message.startswith("configure"):
-		    # e.g., "configuration key:value"
-		    data = message[len("configure") + 1:] # remove "echo " from start of string
-		    pair = data.split(':')
-		    key = pair[0]
-		    value = pair[1]
-		    configuration[key] = value
-		    response_message = "key: %s, value: %s" % (key, configuration[key])
-		    serverSocket.sendto(response_message, address)
-
-		    # Update configuration file on disk
-		    # TODO: Just update the in-memory and sync to disc periodically
-		    builderfile_path = 'fooBuilderfile'
-
-		    # Create default Builderfile if it doesn't exist.
-		    #if not os.path.exists(builderfile_path):
-		    file = open(builderfile_path, 'w')
-
-		    # Write entry in dictionary
-		    for key in configuration:
-			  file.write("%s:%s\n" % (key, configuration[key]))
-
-		    file.close()
-
 		elif message.startswith("echo"):
 		    response_message = message[len("echo") + 1:] # remove "echo " from start of string
-		    print response_message
-		    serverSocket.sendto(response_message, address)
-
-		elif message.startswith('list'):
-		    response_message = list2() # remove "echo " from start of string
 		    print response_message
 		    serverSocket.sendto(response_message, address)
 
@@ -316,8 +307,75 @@ def run2(port=4445):
 
     serverSocket.close()
 
-def list2():
-    builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
+# is_builder_dir(path)
+# get_builder_dir()
+# get_current_dir()
+# get_builder_dir_type(path) # returns 'controller' or 'programmer'/'orchestrator'
+
+# Returns true if the path contains a valid Builderfile.
+# TODO: Check validity of Builderfile.
+def is_builder_path(path=os.getcwd()):
+    builderfile_path = os.path.join(path, 'Builderfile')
+    if os.path.exists(builderfile_path):
+	  return True
+    else:
+	  return False
+
+# TODO: Consider renaming to is_programmer_path() or is_composer_path() or is_assembler_path()
+# TODO: Make sure this doesn't return true when on a coordinator in a sync folder. Check parent directory for Builderfile of coordinator.
+def is_controller_path(path=os.getcwd()):
+    builderfile_path = os.path.join(path, 'Builderfile')
+    if not os.path.exists(builderfile_path):
+	  return False
+
+    # Load the Builderfile
+    builderfile = {}
+    with open(builderfile_path, 'r') as file:
+	  #builderfile = json.loads(file.read())
+	  filelines = file.readlines()
+	  for i in range(len(filelines)):
+		key = filelines[i].split(': ')[0]
+		value = filelines[i].split(': ')[1]
+		value = value.replace('\n', '')
+		builderfile[key] = value
+		logger.info('%s: %s' % (key, value))
+
+    # Check the 'role' field
+    if 'role' in builderfile and builderfile['role'] == 'controller':
+	  return True
+
+    return False
+
+# TODO: Consider renaming to is_orchestrator_path() or is_planner_path()
+def is_coordinator_path(path=os.getcwd()):
+    builderfile_path = os.path.join(path, 'Builderfile')
+    if not os.path.exists(builderfile_path):
+	  return False
+
+    # Load the Builderfile
+    builderfile = {}
+    with open(builderfile_path, 'r') as file:
+	  #builderfile = json.loads(file.read())
+	  filelines = file.readlines()
+	  for i in range(len(filelines)):
+		key = filelines[i].split(': ')[0]
+		value = filelines[i].split(': ')[1]
+		value = value.replace('\n', '')
+		builderfile[key] = value
+		logger.info('%s: %s' % (key, value))
+
+    # Check the 'role' field
+    if 'role' in builderfile and builderfile['role'] == 'coordinator':
+	  return True
+
+    return False
+
+def load_builderfile():
+    None
+
+def generate_listing():
+    #builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
+    builder_dir = os.getcwd()
     builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile')) # this will return current directory in which python file resides.
     # Read the Builderfile
     # TODO: Initialize the daemon here?
@@ -348,10 +406,13 @@ def list2():
     #return "%s\t%s\t%s" % (device_name, device_uuid, device_ip)
     list_dict = {
 	  'name': device_name,
-	  'uuid': device_uuid
+	  'uuid': device_uuid,
+	  'is_controller': '%s' % is_controller_path(),
+	  'is_coordinator': '%s' % is_coordinator_path()
     }
 
-    return json.dumps(list_dict)
+    #return json.dumps(list_dict)
+    return list_dict
 
 if __name__ == "__main__":
     run()

@@ -70,7 +70,7 @@ def builder(command=None):
 	elif args.command == "clean":
 		clean()
 	elif args.command == "start":
-		if args.option1 == "broadcast":
+		if args.option1 == "announce":
 			service.broadcast.start()
 		elif args.option1 == "manager":
 			service.manager.start()
@@ -79,14 +79,14 @@ def builder(command=None):
 			service.broadcast.start()
         # TODO: 'monitor' like "less" command but for UDP traffic, HTTP traffic, etc. (without logging, to stdout)
 	elif args.command == "run":
-		if args.option1 == "broadcast":
+		if args.option1 == "announce":
 			service.broadcast.run()
 		elif args.option1 == 'manager':
 			service.manager.run()
 		elif args.option1 == 'monitor':
 			service.watchdir.run()
 	elif args.command == "stop":
-		if args.option1 == 'broadcast':
+		if args.option1 == 'announce':
 			service.broadcast.stop()
 		elif args.option1 == 'manager':
 			service.manager.stop()

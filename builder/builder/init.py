@@ -56,7 +56,6 @@ def init_physical(name=None, virtual=False):
 		#os.system('cat public_key | cat >> ~/.ssh/authorized_keys')
 		os.system('echo "%s" | cat >> ~/.ssh/authorized_keys' % ssh_insecure_public_key)
 
-
 	else:
 		# Read the Builderfile
 		# TODO: Initialize the daemon here?
