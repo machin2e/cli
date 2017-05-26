@@ -85,6 +85,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 			try:
 				data, fromaddr = s.recvfrom(1000)
 				message, fromaddr = s.recvfrom(1000)
+				print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 				if not fromaddr[0] in addresses:
 					# Log status
 					logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
@@ -106,7 +107,7 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 			current_time = int(round(time.time() * 1000))
 
 		# Send periodic broadcast
-		s.sendto(broadcast_message, (broadcast_address, port)) # Works
+		#s.sendto(broadcast_message, (broadcast_address, port)) # Works
 
 	s.close()
 
