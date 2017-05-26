@@ -81,11 +81,9 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 		current_time = 0
 		response_start_time = int(round(time.time() * 1000))
 
-		print 'foo'
 		while current_time - response_start_time < broadcast_timeout:
-			print 'bar'
 			try:
-				#data, fromaddr = s.recvfrom(1000)
+				data, fromaddr = s.recvfrom(1000)
 				print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], data)
 				message, fromaddr = s.recvfrom(1000)
 				if not fromaddr[0] in addresses:
