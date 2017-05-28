@@ -83,24 +83,23 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 
 		while current_time - response_start_time < broadcast_timeout:
 			try:
-				#data, fromaddr = s.recvfrom(1000)
+				# Receive UDP message
 				message, fromaddr = s.recvfrom(1000)
-				#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
-				if not fromaddr[0] in addresses:
-					# Log status
-					logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
-					#print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
+
+				if not fromaddr[0] in addresses: # Prevents reading packets from the host machine (i.e., broadcasts don't loop back)
 
 					if message.startswith("announce"):
 						# Log status
 						logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
-						# print "Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message)
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string
-						#print response_message
 						serverSocket.sendto(response_message, address)
+					else:
+						# Undefined message
+						None
 
 			except:
+				# Timeout
 				# TODO: Log exception!
 				None
 

@@ -22,8 +22,6 @@ def builder(command=None):
 	parser.add_argument("command")
 	parser.add_argument("option1", nargs='?', default=None)
 	parser.add_argument("-v", "--virtual", action="store_true", help="specify virtual machine (use with init)")
-	#parser.add_argument('integers', metavar='N', type=int, nargs='+', help='an integer for the accumulator')
-	#parser.add_argument('--sum', dest='accumulate', action='store_const', const=sum, default=max, help='sum the integers (default: find the max)')
 
 	# Parse arguments
 	args = None
@@ -34,23 +32,23 @@ def builder(command=None):
 		args = parser.parse_args()
 
 	# TODO: Search for all available "builder_*" files in toolchain and print error with command to repair the toolchain.
-
-        """
-        CLI interface:
-
-        signup
-        login
-        help
+	
+	"""
+	CLI interface:
+	
+	signup
+	login
+	help
 	note [add|remove|list]		Used to add, remove, or list notes for a device or environment/workspace/project.
 	assemble			Starts interactive self-assembly.
-        start [broadcast|discover]
-        status [broadcast|discover]
-        run [broadcast|discover]
-        stop [broadcast|discover]
-        monitor [broadcast|discover]
+	start [broadcast|discover]
+	status [broadcast|discover]
+	run [broadcast|discover]
+	stop [broadcast|discover]
+	monitor [broadcast|discover]
 
-        log
-        """
+	log
+	"""
 
 	if args.command == 'login':
 		None
@@ -151,7 +149,3 @@ def builder(command=None):
 
 if __name__ == "__main__":
 	builder()
-
-# Reference:
-# - argparse: https://docs.python.org/3/library/argparse.html#module-argparse
-# - argparse tutorial: https://docs.python.org/3/howto/argparse.html#id1

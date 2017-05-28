@@ -14,53 +14,53 @@ import cgi
 logger = util.setup_log_folder(__name__)
 
 def start():
-    sys.stdout.write('Starting manager service.')
+	sys.stdout.write('Starting manager service.')
 
-    current_dir = os.getcwdu()
-    p = subprocess.Popen(['builder', 'run', 'manager'], cwd=current_dir)
-    sys.stdout.write(' OK.\n')
+	current_dir = os.getcwdu()
+	p = subprocess.Popen(['builder', 'run', 'manager'], cwd=current_dir)
+	sys.stdout.write(' OK.\n')
 
-    # Log status
-    logger.info('Started manager service.')
+	# Log status
+	logger.info('Started manager service.')
 
 def stop():
-    sys.stdout.write('Stopping manager service.')
+	sys.stdout.write('Stopping manager service.')
 
-    # Log status
-    logger.info('Stopped manager service.')
+	# Log status
+	logger.info('Stopped manager service.')
 
-    # Locate pidfile (if it exists)
-    current_dir = os.getcwd()
-    pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
+	# Locate pidfile (if it exists)
+	current_dir = os.getcwd()
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
 
-    # Read pid from pidfile
-    pidfile = open(pidfile_path, "r")
-    content = pidfile.readlines()
-    pidfile.close()
-    content = [x.strip() for x in content] # remove whitespace characters like `\n` at the end of each line
-    # print content
-    pid = int(content[0])
+	# Read pid from pidfile
+	pidfile = open(pidfile_path, "r")
+	content = pidfile.readlines()
+	pidfile.close()
+	content = [x.strip() for x in content] # remove whitespace characters like `\n` at the end of each line
+	# print content
+	pid = int(content[0])
 
-    # Kill process
-    util.kill_proc_tree(pid)
+	# Kill process
+	util.kill_proc_tree(pid)
 
-    # Delete pidfile
-    os.remove(pidfile_path)
+	# Delete pidfile
+	os.remove(pidfile_path)
 
-    sys.stdout.write(' OK.\n')
+	sys.stdout.write(' OK.\n')
 
 class S(BaseHTTPRequestHandler):
-    def _set_headers(self):
+	def _set_headers(self):
 	  self.send_response(200)
 	  self.send_header('Content-type', 'text/html')
 	  self.end_headers()
 
-    # /status
-    # /announce
-    # /configure
-    # /echo
-    # /list
-    def do_GET(self):
+	# /status
+	# /announce
+	# /configure
+	# /echo
+	# /list
+	def do_GET(self):
 	  parsed_path = urlparse.urlparse(self.path)
 
 	  query_dict = urlparse.parse_qsl(urlparse.urlsplit(self.path).query)
@@ -71,6 +71,13 @@ class S(BaseHTTPRequestHandler):
 	  #print "resource: %s" % resource
 	  #print "query: %s" % query
 
+		# Status:
+		# - role
+		# - discovery status
+		# - CoAP server status
+		# - HTTP server status
+		# - current project UUID
+		# - current connected devices
 	  if resource == '/status':
 
 		# Set headers
@@ -78,38 +85,9 @@ class S(BaseHTTPRequestHandler):
 		self.send_header('Content-Type', 'application/json')
 		self.end_headers()
 
-		# Generate data structure
-		#builder_dir = os.path.abspath('/builder')
-		builder_dir = os.getcwd()
-		builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile'))
-
-		file = open(builderfile_path, 'r')
-		filelines = file.readlines()
-		file.close()
-
-		device_uuid = 'N/A'
-		device_name = 'N/A'
-		device_ip = 'N/A'
-
-		for i in range(len(filelines)):
-
-		    # Read human-readable name 
-		    if filelines[i].startswith('name:'):
-			  device_name = filelines[i].split(': ')[1]
-			  device_name = device_name.replace('\n', '')
-
-		    # Read UUID
-		    if filelines[i].startswith('uuid:'):
-			  device_uuid = filelines[i].split(': ')[1]
-			  device_uuid = device_uuid.replace('\n', '')
-
-		status = {
-		    'name': device_name,
-		    'uuid': device_uuid
-		}
-
-		# Generate JSON for data structure
-		status_json = json.dumps(status)
+		# Generate response
+		builderfile = util.load_builderfile()
+		status_json = json.dumps(builderfile, indent=4, sort_keys=False)
 
 		# Write response
 		self.wfile.write(status_json)
@@ -122,13 +100,11 @@ class S(BaseHTTPRequestHandler):
 		self.end_headers()
 
 		# Generate response
-		listing_dict = generate_listing()
-		print '%s' % listing_dict
-
-		listing_dict_json = json.dumps(listing_dict, indent=4, sort_keys=False)
+		listing = generate_listing()
+		listing_json = json.dumps(listing, indent=4, sort_keys=False)
 
 		# Generate JSON for data structure
-		response_body = listing_dict_json
+		response_body = listing_json
 
 		# Write response
 		self.wfile.write(response_body)
@@ -142,7 +118,7 @@ class S(BaseHTTPRequestHandler):
 
 		# Generate data structure
 		#builder_dir = os.path.abspath('/builder')
-		builder_dir = os.getcwd()
+		builder_dir = os.getcwdu()
 		builderfile_path = os.path.abspath(os.path.join(builder_dir, 'db_state.json'))
 
 		# Load the record from database
@@ -158,14 +134,10 @@ class S(BaseHTTPRequestHandler):
 		# Write response
 		self.wfile.write(response_body)
 
-	  elif resource == '/info':
-		self._set_headers()
-		self.wfile.write("<html><body><h1>info</h1></body></html>")
-
-    def do_HEAD(self):
+	def do_HEAD(self):
 	  self._set_headers()
 
-    def do_POST(self):
+	def do_POST(self):
 	  parsed_path = urlparse.urlparse(self.path)
 
 	  #query_dict = urlparse.parse_qsl(urlparse.urlsplit(self.path).query)
@@ -219,7 +191,7 @@ class S(BaseHTTPRequestHandler):
 
 		# Update the record 
 		for key in request_dict.keys():
-		    db_dict[key] = request_dict[key]
+			db_dict[key] = request_dict[key]
 		db_dict_json = json.dumps(db_dict, indent=4, sort_keys=False)
 		#logger.info('---\n%s\n---' % db_dict_json)
 
@@ -239,73 +211,73 @@ class S(BaseHTTPRequestHandler):
 
 		# Generate response (with JSON)
 		#status = {
-		#   'name': 'foo',
-		#   'uuid': 'bar' 
+		#	'name': 'foo',
+		#	'uuid': 'bar' 
 		#}
 
 		# Write response
 		self.wfile.write('%s' % response['body'])
 
 def run(server_class=HTTPServer, handler_class=S, port=80):
-    print 'Starting HTTP server.'
+	print 'Starting HTTP server.'
 
-    # Write pid into pidfile
-    current_dir = os.getcwd()
-    pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
-    # TODO: get name of file for naming "builder.<filename>.pid"
-    # TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
-    pidfile = open(pidfile_path, "w+")
-    #portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
-    pidfile.write('%s' % os.getpid())
-    pidfile.close()
+	# Write pid into pidfile
+	current_dir = os.getcwd()
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
+	# TODO: get name of file for naming "builder.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
+	pidfile = open(pidfile_path, "w+")
+	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
+	pidfile.write('%s' % os.getpid())
+	pidfile.close()
 
-    # Start HTTP server
-    server_address = ('', port)
-    httpd = server_class(server_address, handler_class)
+	# Start HTTP server
+	server_address = ('', port)
+	httpd = server_class(server_address, handler_class)
 
-    print ' OK.'
-    httpd.serve_forever()
+	print ' OK.'
+	httpd.serve_forever()
 
 def run2(port=4445):
 
-    # Write pid into pidfile
-    current_dir = os.getcwd()
-    pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
-    # TODO: get name of file for naming "builder.<filename>.pid"
-    # TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
-    pidfile = open(pidfile_path, "w+")
-    #portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
-    pidfile.write('%s' % os.getpid())
-    pidfile.close()
+	# Write pid into pidfile
+	current_dir = os.getcwd()
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
+	# TODO: get name of file for naming "builder.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
+	pidfile = open(pidfile_path, "w+")
+	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
+	pidfile.write('%s' % os.getpid())
+	pidfile.close()
 
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    serverSocket.bind(('', port))
+	serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	serverSocket.bind(('', port))
 
-    response_timeout = 2.0 # seconds
+	response_timeout = 2.0 # seconds
 
-    #serverSocket.settimeout(response_timeout)
-    serverSocket.setblocking(0)
+	#serverSocket.settimeout(response_timeout)
+	serverSocket.setblocking(0)
 
-    configuration = {}
+	configuration = {}
 
-    while True:
-	  try:
-		message, address = serverSocket.recvfrom(1024)
-		# print message, address
+	while True:
+		try:
+			message, address = serverSocket.recvfrom(1024)
+			# print message, address
+			
+			if message.startswith("announce"):
+				print "Received:", message, "from", address
+				logger.info('Received: %s from %s' % (message, address))
+			
+			elif message.startswith("echo"):
+				response_message = message[len("echo") + 1:] # remove "echo " from start of string
+				print response_message
+				serverSocket.sendto(response_message, address)
 
-		if message.startswith("announce"):
-		    print "Received:", message, "from", address
-		    logger.info('Received: %s from %s' % (message, address))
-
-		elif message.startswith("echo"):
-		    response_message = message[len("echo") + 1:] # remove "echo " from start of string
-		    print response_message
-		    serverSocket.sendto(response_message, address)
-
-	  except:
-		None
-
-    serverSocket.close()
+		except:
+			None
+			
+	serverSocket.close()
 
 # is_builder_dir(path)
 # get_builder_dir()
@@ -315,104 +287,38 @@ def run2(port=4445):
 # Returns true if the path contains a valid Builderfile.
 # TODO: Check validity of Builderfile.
 def is_builder_path(path=os.getcwd()):
-    builderfile_path = os.path.join(path, 'Builderfile')
-    if os.path.exists(builderfile_path):
-	  return True
-    else:
-	  return False
+	builderfile_path = os.path.join(path, 'Builderfile')
+	if os.path.exists(builderfile_path):
+		return True
+	else:
+		return False
 
 # TODO: Consider renaming to is_programmer_path() or is_composer_path() or is_assembler_path()
 # TODO: Make sure this doesn't return true when on a coordinator in a sync folder. Check parent directory for Builderfile of coordinator.
 def is_controller_path(path=os.getcwd()):
-    builderfile_path = os.path.join(path, 'Builderfile')
-    if not os.path.exists(builderfile_path):
-	  return False
+	# Load the Builderfile
+	builderfile = util.load_builderfile(path)
+	
+	# Check the 'role' field
+	if 'role' in builderfile and builderfile['role'] == 'controller':
+		return True
 
-    # Load the Builderfile
-    builderfile = {}
-    with open(builderfile_path, 'r') as file:
-	  #builderfile = json.loads(file.read())
-	  filelines = file.readlines()
-	  for i in range(len(filelines)):
-		key = filelines[i].split(': ')[0]
-		value = filelines[i].split(': ')[1]
-		value = value.replace('\n', '')
-		builderfile[key] = value
-		logger.info('%s: %s' % (key, value))
-
-    # Check the 'role' field
-    if 'role' in builderfile and builderfile['role'] == 'controller':
-	  return True
-
-    return False
+	return False
 
 # TODO: Consider renaming to is_orchestrator_path() or is_planner_path()
 def is_coordinator_path(path=os.getcwd()):
-    builderfile_path = os.path.join(path, 'Builderfile')
-    if not os.path.exists(builderfile_path):
-	  return False
+	# Load the Builderfile
+	builderfile = util.load_builderfile(path)
+	
+	# Check the 'role' field
+	if 'role' in builderfile and builderfile['role'] == 'coordinator':
+		return True
 
-    # Load the Builderfile
-    builderfile = {}
-    with open(builderfile_path, 'r') as file:
-	  #builderfile = json.loads(file.read())
-	  filelines = file.readlines()
-	  for i in range(len(filelines)):
-		key = filelines[i].split(': ')[0]
-		value = filelines[i].split(': ')[1]
-		value = value.replace('\n', '')
-		builderfile[key] = value
-		logger.info('%s: %s' % (key, value))
-
-    # Check the 'role' field
-    if 'role' in builderfile and builderfile['role'] == 'coordinator':
-	  return True
-
-    return False
-
-def load_builderfile():
-    None
+	return False
 
 def generate_listing():
-    #builder_dir = os.path.abspath('/builder') # this will return current directory in which python file resides.
-    builder_dir = os.getcwd()
-    builderfile_path = os.path.abspath(os.path.join(builder_dir, 'Builderfile')) # this will return current directory in which python file resides.
-    # Read the Builderfile
-    # TODO: Initialize the daemon here?
-    file = open(builderfile_path, 'r')
-    filelines = file.readlines()
-    file.close()
-    
-    device_uuid = 'N/A'
-    device_name = 'N/A'
-    device_ip = 'N/A'
-
-    for i in range(len(filelines)):
-
-	  # Read human-readable name 
-	  if filelines[i].startswith('name:'):
-		device_name = filelines[i].split(': ')[1]
-		device_name = device_name.replace('\n', '')
-
-	  # Read UUID
-	  if filelines[i].startswith('uuid:'):
-		device_uuid = filelines[i].split(': ')[1]
-		device_uuid = device_uuid.replace('\n', '')
-    
-    # Set IP address
-    #device_ip = socket.gethostbyname(socket.gethostname())
-
-    # Print the device listing
-    #return "%s\t%s\t%s" % (device_name, device_uuid, device_ip)
-    list_dict = {
-	  'name': device_name,
-	  'uuid': device_uuid,
-	  'is_controller': '%s' % is_controller_path(),
-	  'is_coordinator': '%s' % is_coordinator_path()
-    }
-
-    #return json.dumps(list_dict)
-    return list_dict
+	builderfile = util.load_builderfile()
+	return builderfile 
 
 if __name__ == "__main__":
-    run()
+	run()
