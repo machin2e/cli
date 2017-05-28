@@ -104,8 +104,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 
 						# Save device status in registry (in SQLite database)
 						builder_db_path = util.get_database_path()
-                        db = TinyDB(builder_db_path, default_table='builder')
-                        device_table = db.table('device')
+						db = TinyDB(builder_db_path, default_table='builder')
+						device_table = db.table('device')
 
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string

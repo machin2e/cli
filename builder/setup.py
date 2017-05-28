@@ -13,7 +13,7 @@ setup(
 		'pexpect',
 		'psutil',
 		'netifaces',
-		'portalocker'
+		'portalocker',
                 'tinydb'
 	],
 	entry_points = {

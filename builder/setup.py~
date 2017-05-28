@@ -14,6 +14,7 @@ setup(
 		'psutil',
 		'netifaces',
 		'portalocker'
+                'tinydb'
 	],
 	entry_points = {
 		'console_scripts': ['builder=builder.command_line:main'],
