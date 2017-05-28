@@ -7,6 +7,7 @@ import uuid
 import logging
 from tinydb import TinyDB, Query
 from datetime import datetime
+import json
 from ..util import util
 
 # Initialize logging
