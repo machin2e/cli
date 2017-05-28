@@ -26,18 +26,53 @@ def get_inet_addresses():
 				addresses.append(i['addr'])
 	return addresses
 
-# Initialize logging folder.
-# Setup log folder in `.builder/logs/`.
-def setup_log_folder(log_name):
+# Checks if the current directory or parent directory contains the specified file, recursively, starting with the specified path.
+# If so, returns the path containing the file.
+def parent_contains(filename, path=os.getcwdu(), recursive=True):
+	# TODO: rename to locate_file
+	file_path = os.path.join(path, filename)
+	if os.path.exists(file_path):
+		return path
 
-	current_dir = os.getcwdu()
+	if recursive:
+		parent_dir_path = os.path.abspath(os.path.join(path, os.pardir))
+		is_root_dir = parent_dir_path == path
+		if not is_root_dir:
+			return parent_contains(filename, parent_dir_path)
+		else:
+			return parent_contains(filename, parent_dir_path, recursive=False)
+	else:
+		return None
 
-	builder_folder = os.path.join(current_dir, '.builder')
+def get_builder_root(path=os.getcwdu()):
+	return parent_contains('.builder')
+
+def is_builder_root(path=os.getcwdu()):
+	return path == get_builder_root(path)
+
+def is_builder_tree(path=os.getcwdu()):
+	if parent_contains('.builder'):
+		return True
+	else:
+		return False
+
+
+def logger(log_name):
+	"""
+	Returns a logger for the log located at '.builder/logs/<log_name>'.
+	If the log doesn't exist, creates it in the '.builder/logs' directory.
+	"""
+
+	#current_dir = os.getcwdu()
+	builder_root = get_builder_root()
+	#TODO: if builder_root != None:
+
+	builder_folder = os.path.join(builder_root, '.builder')
 	if not os.path.exists(builder_folder):
 		print 'mkdir %s' % builder_folder
 		os.makedirs(builder_folder)
 
-	log_folder = os.path.join(current_dir, '.builder', 'logs')
+	log_folder = os.path.join(builder_root, '.builder', 'logs')
 	if not os.path.exists(log_folder):
 		print 'mkdir %s' % log_folder 
 		os.makedirs(log_folder)
@@ -90,17 +125,16 @@ def get_vagrant_file(name):
 	return vagrantfiledata
 
 # Load the Builderfile into a dictionary
-def load_builderfile(path=os.getcwdu()):
-	# Generate data structure
-	builderfile_path = os.path.abspath(os.path.join(path, 'Builderfile'))
+def load_builderfile(path=get_builder_root()):
+	builder_config_path = os.path.join(path, '.builder', 'config')
 
 	# Load the record from database
-	builderfile = {}
-	with open(builderfile_path, 'r') as file:
-		builderfile = json.loads(file.read())
+	builder_config = {}
+	with open(builder_config_path, 'r') as file:
+		builder_config = json.loads(file.read())
 		#builderfile_json = json.dumps(builderfile, indent=4, sort_keys=False)
 
-	return builderfile
+	return builder_config
 
 # Write updated database
 def store_builderfile(builderfile, path=os.getcwdu()):

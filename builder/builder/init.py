@@ -11,6 +11,7 @@ import subprocess
 import uuid
 import petname
 import util
+import json
 
 def init(name=None, virtual=False):
 	if virtual == True:
@@ -19,70 +20,49 @@ def init(name=None, virtual=False):
 		init_physical(name, virtual)
 
 def init_physical(name=None, virtual=False):
-	builderfile_path = './Builderfile'
 
-	# Create default Builderfile if it doesn't exist.
-	if not os.path.exists(builderfile_path):
+	# Check if cwd contains .builder, or if any of it's parents contain one (if so, we're in a builder repository)
+	#	If not, create it and populate it with a 'config' file that will contain initial config
+	#	If so, print error 'Current/parent directory already contains a .builder folder'
 
-		file = open(builderfile_path, 'w')
+	parent_path = util.parent_contains('.builder')
+	if not parent_path is None:
+		print 'Error: I can\'t do that.'
+		print 'Reason: There is already a .builder directory at %s.' % parent_path
+		print 'Hint: Use `cd` to change to a different directory.' 
 
-		# Write human-readable name
-		if name == None:
-			name = petname.Generate(2)
-		file.write("name: %s\n" % name)
+	else:
 
-		# Write UUID
-		device_uuid = uuid.uuid4()
-		file.write("uuid: %s\n" % device_uuid)
+		# Initialize the builder root file system
+		current_path = os.getcwdu()
+		builder_dir_path = os.path.join(current_path, '.builder')
+		builder_config_path = os.path.join(builder_dir_path, 'config')
 
-		# Project UUID
-		project_uuid = None
-		file.write("project: %s\n" % project_uuid)
+		builder_path = os.path.join(current_path, '.builder')
+		if not os.path.exists(builder_path):
+			print 'mkdir %s' % builder_path 
+			os.makedirs(builder_path)
 
-                # device: <device-profile-uuid>
+		# Initialize builder config file
+		builder_config = {
+			'name': petname.Generate(2) if name == None else name,
+			'uuid': str(uuid.uuid4()), # TODO: read UUID from hardware!
+			'project': 'none',
+			'role': 'none',
+			'project': 'none'
+		}
+		builder_config_json = json.dumps(builder_config, indent=4, sort_keys=False)
 
-		# Provider: builder, vagrant
-
-		file.close()
-
+		builder_config_path = os.path.join(current_path, '.builder', 'config')
+		if not os.path.exists(builder_config_path):
+			print 'touch %s' % builder_config_path 
+			with open(builder_config_path, 'w+') as file:
+				file.write(builder_config_json)
 
 		# TODO: Only do this for builder devices! Not dev machines!
 		# Add insecure pre-shared SSH public key
 		ssh_insecure_public_key = util.get_file('public_key')
-
-		# e.g., `cat public_key | cat >> ~/.ssh/authorized_keys`
-		#process = subprocess.Popen(['cat', 'public_key', '|', 'cat', '>>', '~/.ssh/authorized_keys'], stdout=subprocess.PIPE, cwd=util.get_current_dir(), bufsize=1)
-		#process.wait()
-		#os.system('cat public_key | cat >> ~/.ssh/authorized_keys')
 		os.system('echo "%s" | cat >> ~/.ssh/authorized_keys' % ssh_insecure_public_key)
-
-	else:
-		# Read the Builderfile
-		# TODO: Initialize the daemon here?
-		file = open(builderfile_path, 'r')
-		filelines = file.readlines()
-
-		for i in range(len(filelines)):
-
-			# Read human-readable name 
-			if filelines[i].startswith('name:'):
-				name = filelines[i].split(': ')[1]
-				#print filelines[i]
-				print name.replace('\n', '')
-
-			# Read UUID
-			if filelines[i].startswith('uuid:'):
-				device_uuid = filelines[i].split(': ')[1]
-				#print filelines[i]
-				print device_uuid.replace('\n', '')
-
-			# Read Project UUID
-			if filelines[i].startswith('project:'):
-				device_uuid = filelines[i].split(': ')[1]
-				#print filelines[i]
-				print device_uuid.replace('\n', '')
-
-		file.close()
 
 def init_virtual(name=None, virtual=True):
 
@@ -130,29 +110,6 @@ def init_virtual(name=None, virtual=True):
 	# How are you?
 	# ...
 	# // this will trigger refactoring moving "TODO" on top of "Hello there". (Make a little continuous-running vim robot (scripted inline right in Vim. Make it a plugin!)).
-	while True:
-		#output = process.stdout.readline()
-		output = process.stdout.read(1)
-		if output == '' and process.poll() is not None:
-			break
-		if output:
-			sys.stdout.write(output)
-			sys.stdout.flush()
-			#print output.strip(),
-
-def vagrant_status():
-	cwd = os.path.dirname(os.path.realpath(__file__))
-	cwd = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.builder', 'vagrant')
-
-	curfilePath = os.path.abspath(__file__)
-	curDir = os.path.abspath(os.path.join(curfilePath,os.pardir)) # this will return current directory in which python file resides.
-	parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) 
-	#cwd = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.builder', 'vagrant')
-	cwd = os.path.join(parentDir, '.builder', 'vagrant')
-	print cwd
-
-	process = subprocess.Popen(['vagrant', 'status'], stdout=subprocess.PIPE, cwd=cwd, bufsize=1)
-
 	while True:
 		#output = process.stdout.readline()
 		output = process.stdout.read(1)

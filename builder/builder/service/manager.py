@@ -10,10 +10,10 @@ import SocketServer
 import urlparse
 import cgi
 
-# Initialize logging
-logger = util.setup_log_folder(__name__)
-
 def start():
+	# Initialize logging
+	logger = util.logger(__name__)
+
 	sys.stdout.write('Starting manager service.')
 
 	current_dir = os.getcwdu()
@@ -27,6 +27,7 @@ def stop():
 	sys.stdout.write('Stopping manager service.')
 
 	# Log status
+	logger = util.logger(__name__)
 	logger.info('Stopped manager service.')
 
 	# Locate pidfile (if it exists)
@@ -156,6 +157,7 @@ class S(BaseHTTPRequestHandler):
 		self.content_body = self.rfile.read(int(self.headers['Content-Length']))
 
 		# Log request
+		logger = util.logger(__name__)
 		logger.info('\nPOST %s\n%s\n%s\n' % (self.path, self.headers, self.content_body))
 
 		# Set headers
@@ -237,47 +239,6 @@ def run(server_class=HTTPServer, handler_class=S, port=80):
 
 	print ' OK.'
 	httpd.serve_forever()
-
-def run2(port=4445):
-
-	# Write pid into pidfile
-	current_dir = os.getcwd()
-	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
-	# TODO: get name of file for naming "builder.<filename>.pid"
-	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
-	pidfile = open(pidfile_path, "w+")
-	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
-	pidfile.write('%s' % os.getpid())
-	pidfile.close()
-
-	serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	serverSocket.bind(('', port))
-
-	response_timeout = 2.0 # seconds
-
-	#serverSocket.settimeout(response_timeout)
-	serverSocket.setblocking(0)
-
-	configuration = {}
-
-	while True:
-		try:
-			message, address = serverSocket.recvfrom(1024)
-			# print message, address
-			
-			if message.startswith("announce"):
-				print "Received:", message, "from", address
-				logger.info('Received: %s from %s' % (message, address))
-			
-			elif message.startswith("echo"):
-				response_message = message[len("echo") + 1:] # remove "echo " from start of string
-				print response_message
-				serverSocket.sendto(response_message, address)
-
-		except:
-			None
-			
-	serverSocket.close()
 
 # is_builder_dir(path)
 # get_builder_dir()

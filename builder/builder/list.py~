@@ -5,7 +5,8 @@ import json
 import requests
 
 def list(name=None):
-    # TODO: Get IP of the specified device!
+	# TODO: Get IP of the specified device!
+	None
 
 def list_udp(name=None):
 	PORT = 4445
@@ -60,7 +61,6 @@ def create_builder_folder(data):
 
 def list2():
 	builderfile_path = './Builderfile'
-
 
 	# Read the Builderfile
 	# TODO: Initialize the daemon here?

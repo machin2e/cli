@@ -50,6 +50,13 @@ def builder(command=None):
 	log
 	"""
 
+	if not args.command == 'init':
+		if not util.is_builder_tree():
+			print 'Error: I can\'t do that.'
+			print 'Reason: There is no .builder directory in the current or parent directories.'
+			print 'Hint: Run `builder init`.' 
+			return
+
 	if args.command == 'login':
 		None
 	elif args.command == 'logout':
