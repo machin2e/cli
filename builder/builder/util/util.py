@@ -136,6 +136,13 @@ def load_builderfile(path=get_builder_root()):
 
 	return builder_config
 
+# TODO: class Database:
+
+# Get the path to SQLite database
+def get_database_path(path=get_builder_root()):
+	builder_db_path = os.path.join(path, '.builder', 'database')
+	return builder_db_path
+
 # Write updated database
 def store_builderfile(builderfile, path=os.getcwdu()):
 	builderfile_json = json.dumps(builderfile, indent=4, sort_keys=False)

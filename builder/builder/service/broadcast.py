@@ -5,6 +5,8 @@ import subprocess, psutil, tempfile, portalocker
 import socket
 import uuid
 import logging
+from tinydb import TinyDB, Query
+from datetime import datetime
 from ..util import util
 
 # Initialize logging
@@ -79,7 +81,9 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	# e.g., "\f52	16561	text	announce device 002fffff-ffff-ffff-4e45-3158200a0015"
 	# data = "\f52\t16561\ttext\tannounce device 002fffff-ffff-ffff-4e45-3158200a0015";
 	# data = "\f52\t33439\ttext\tannounce device f1aceb8b-e8e9-4cda-b29c-de7bc7cc390f"
-	broadcast_message = "announce device %s" % device_uuid
+    builder_config = util.load_builderfile()
+    broadcast_message = json.dumps(builder_config)
+	#broadcast_message = "announce device %s" % device_uuid
 
 	while True:
 
@@ -97,13 +101,15 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 					if message.startswith("announce"):
 						# Log status
 						logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
+
+						# Save device status in registry (in SQLite database)
+						builder_db_path = util.get_database_path()
+                        db = TinyDB(builder_db_path, default_table='builder')
+                        device_table = db.table('device')
+
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string
 						serverSocket.sendto(response_message, address)
-					elif message.startswith('list'):
-						builder_config = util.load_builderfile()
-						builder_config_json = json.dumps(builder_config, indent=4, sort_keys=False)
-						serverSocket.sendto(builder_config_json, address)
 					else:
 						# Undefined message
 						None
