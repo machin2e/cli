@@ -81,8 +81,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	# e.g., "\f52	16561	text	announce device 002fffff-ffff-ffff-4e45-3158200a0015"
 	# data = "\f52\t16561\ttext\tannounce device 002fffff-ffff-ffff-4e45-3158200a0015";
 	# data = "\f52\t33439\ttext\tannounce device f1aceb8b-e8e9-4cda-b29c-de7bc7cc390f"
-    builder_config = util.load_builderfile()
-    broadcast_message = json.dumps(builder_config)
+	builder_config = util.load_builderfile()
+	broadcast_message = json.dumps(builder_config)
 	#broadcast_message = "announce device %s" % device_uuid
 
 	while True:
