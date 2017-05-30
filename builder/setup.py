@@ -3,7 +3,7 @@ setup(
 	name="builder",
 	description="Builder",
 	version="0.0.1",
-	url="https://github.com/mokogobo/builder",
+	url="https://github.com/buildernetwork/builder-python",
 	author="Builder Network",
 	zip_safe=False,
 	packages=find_packages(),
@@ -14,6 +14,7 @@ setup(
 		'psutil',
 		'netifaces',
 		'portalocker',
+                'watchdog',
                 'tinydb'
 	],
 	entry_points = {

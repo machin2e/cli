@@ -6,10 +6,11 @@ import time
 import util
 
 def ssh(name=None):
-	current_dir = os.getcwd()
-	device_ip = util.request_ip_address(name)
+	machine_path = util.get_machine_path(name)
+	device_ip = util.request_ip_address(name) # TODO: lookup the IP address of the device (and if it's a VM, make sure it's running!)
 	if device_ip != None:
-		subprocess.call(['ssh', '-l', 'vagrant', device_ip])
+		username = 'vagrant'
+		subprocess.call(['ssh', '-l', username, device_ip], cwd=machine_path)
 
 if __name__ == "__main__":
 	ssh()

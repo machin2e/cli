@@ -6,6 +6,10 @@ import netifaces
 import logging
 import pkg_resources
 
+# -----------------------------------------------------------------------------
+# Process Management
+# -----------------------------------------------------------------------------
+
 def kill_proc_tree(pid, including_parent=True):    
 	parent = psutil.Process(pid)
 	children = parent.children(recursive=True)
@@ -16,6 +20,10 @@ def kill_proc_tree(pid, including_parent=True):
 		parent.kill()
 		parent.wait(5)
 
+# -----------------------------------------------------------------------------
+# Network Management
+# -----------------------------------------------------------------------------
+
 def get_inet_addresses():
 	addresses = []
 	for iface_name in netifaces.interfaces():
@@ -25,6 +33,10 @@ def get_inet_addresses():
 			if not i['addr'] == None:
 				addresses.append(i['addr'])
 	return addresses
+
+# -----------------------------------------------------------------------------
+# File System Management
+# -----------------------------------------------------------------------------
 
 # Checks if the current directory or parent directory contains the specified file, recursively, starting with the specified path.
 # If so, returns the path containing the file.
@@ -56,6 +68,8 @@ def is_builder_tree(path=os.getcwdu()):
 	else:
 		return False
 
+def get_machine_path(name, path=get_builder_root()):
+	return os.path.join(path, '.builder', 'devices', name)
 
 def logger(log_name):
 	"""

@@ -17,7 +17,7 @@ def start():
 	sys.stdout.write('Starting manager service.')
 
 	current_dir = os.getcwdu()
-	p = subprocess.Popen(['builder', 'run', 'manager'], cwd=current_dir)
+	p = subprocess.Popen(['builder', 'manage', 'run'], cwd=current_dir)
 	sys.stdout.write(' OK.\n')
 
 	# Log status

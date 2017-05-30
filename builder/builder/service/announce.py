@@ -18,7 +18,7 @@ def start():
 
 	sys.stdout.write('Starting broadcast service.')
 	current_file_path = os.getcwdu()
-	p = subprocess.Popen(['builder', 'run', 'announce'], cwd=current_file_path)
+	p = subprocess.Popen(['builder', 'announce', 'run'], cwd=current_file_path)
 	sys.stdout.write(' OK.\n')
 
 	# Log status

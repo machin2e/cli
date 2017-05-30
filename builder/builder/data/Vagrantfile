@@ -28,7 +28,6 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", privileged: false, inline: <<-SHELL
 		cd /builder
 		builder init %NAME%
-		# builder start manager
-		builder start manager
+		builder announce start
 	SHELL
 end
