@@ -83,7 +83,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	# data = "\f52\t16561\ttext\tannounce device 002fffff-ffff-ffff-4e45-3158200a0015";
 	# data = "\f52\t33439\ttext\tannounce device f1aceb8b-e8e9-4cda-b29c-de7bc7cc390f"
 	builder_config = util.load_builderfile()
-	broadcast_message = json.dumps(builder_config)
+	broadcast_message = 'announce\n\n%s' % json.dumps(builder_config)
+	logger.info('%s' % broadcast_message)
 	#broadcast_message = "announce device %s" % device_uuid
 
 	while True:
@@ -99,14 +100,32 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 				if not fromaddr[0] in addresses: # Prevents reading packets from the host machine (i.e., broadcasts don't loop back)
 
 					# TODO: abstract this out based on 'requests' library abstraction level, then put it up on github and pip!
-					if message.startswith("announce"):
+					#if message.startswith("announce"):
+					if message.startswith("{"):
 						# Log status
 						logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
+
+						# HACK
+						# TODO: rename 'device' to something better...
+						# TODO: don't populate this data here... create the structure on the sender's side
+						device = json.loads(message)
+						device['address'] = {}
+						device['ip4'] = fromaddr[0]
+						device['time_created'] = datetime.utcnow().isoformat()
+						device['time_updated'] = datetime.utcnow().isoformat()
 
 						# Save device status in registry (in SQLite database)
 						builder_db_path = util.get_database_path()
 						db = TinyDB(builder_db_path, default_table='builder')
 						device_table = db.table('device')
+
+						Device = Query()
+						device_element = device_table.search(Device.name == device['name'])
+						if len(device_element) == 0:
+							device_table.insert(device)
+						else:
+							del device['time_created']
+							device_table.update(device, Device.name == device['name'])
 
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string
