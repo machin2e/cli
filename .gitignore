@@ -101,6 +101,17 @@ ENV/
 .mypy_cache/
 
 # vim
+#*~
+#*.swo
+#*.swp
+
+# vim swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# vim session
+Session.vim
+# vim temporary
+.netrwhist
 *~
-*.swo
-*.swp
+# vim auto-generated tag files
+tags
