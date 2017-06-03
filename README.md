@@ -31,7 +31,10 @@ builder init desktop				Used to init a Builder env called desktop.
 #### `builder stop`
 #### `builder announce`
 #### `builder manage`
+
 #### `builder device`
+##### `builder device list|add|remove`
+
 #### `builder interface`
 #### `builder view`
 
