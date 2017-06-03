@@ -21,11 +21,22 @@ This repository contains:
 
 _Examples:_
 ```
-builder init						Used to initialize this folder (assigns a default name).
-builder init -v						Used to create and init a VM (via Vagrant).
+builder init					Used to initialize this folder (assigns a default name).
+builder init -v					Used to create and init a VM (via Vagrant).
 builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
 builder init desktop				Used to init a Builder env called desktop.
 ```
+
+#### `builder start`
+#### `builder stop`
+#### `builder announce`
+#### `builder manage`
+#### `builder device`
+#### `builder interface`
+#### `builder view`
+
+**Unorganized**
+
 ```
 signup
 login
