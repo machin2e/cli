@@ -13,9 +13,11 @@ This repository contains:
 1. Builder CLI
 2. Builder Python API
 
-## Usage (CLI) 
+## Command Line Interface
 
-### `builder init`
+### Usage
+
+#### `builder init`
 
 __Examples:__
 ```
