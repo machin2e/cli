@@ -1,24 +1,20 @@
-# The Builderfile is used to bootstrap the Builder daemon which manages 
-# the device's configuration and allows it to be edited in real-time 
-# from smartphone and when plugged in over USB as mass storage.
-
-# Create "Builderfile" that contains:
-# - UUID
-# - human-readable name
-
-import os, sys
+import os, sys, shutil
 import subprocess
+import json
 import uuid
 import petname
+from tabulate import tabulate
+from tinydb import TinyDB, Query
+
 import util
-import json
 
 def add(name, virtual=True):
+	# TODO: Check if the machine already exists. Only add if the specified name doesn't already exist. If using a generated name, choose a unique name.
 
 	if name == None:
 		name = petname.Generate(2)
 
-	machine_path = init_machine_path(name)
+	machine_path = util.init_machine_path(name)
 
 	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
@@ -42,75 +38,167 @@ def add(name, virtual=True):
 	sys.stdout.write(' OK.\n')
 	sys.stdout.flush()
 
+	# Start VM
+	start(name)
+
+	# TODO: CLI style where you enter high level commands with minimum info to start a interactive questionairre prompting for variable values (but with defaults assigned), also skippable, and if skipped, added to "todos".
+
+def list(name=None):
+
+	machines = util.get_machines()
+
+	# Generate table! Use tabulate if you can...
+	columns = [ 'status', 'hostname', 'uuid', 'ip4', 'ip6' ]
+	table_column_separator_width = 4 # spaces
+	table_column_width = []
+	table_rows = []
+
+	#print 'name\tuuid\taddress (ip4)'
+	for machine in machines:
+		#print '%s%s%s%s%s' % (machine['name'], ' ' * 4, machine['uuid'], ' ' * 4, machine['address']['ip4'])
+		table_row = []
+		table_row.append(machine.get('status', 'N/A')) # returns machine['status'] or 'N/A' if 'name' key doesn't exist
+		table_row.append(machine.get('name', 'N/A')) # returns machine['name'] or 'N/A' if 'name' key doesn't exist
+		table_row.append(machine.get('uuid', 'N/A')) # returns machine['uuid'] or 'N/A' if 'name' key doesn't exist
+		table_row.append(machine['address'].get('ip4', 'N/A')) # returns machine['address']['ip4'] or 'N/A' if 'name' key doesn't exist
+		table_row.append(machine['address'].get('ip6', 'N/A')) # returns machine['address']['ip6'] or 'N/A' if 'name' key doesn't exist
+		table_rows.append(table_row)
+	
+	print tabulate(table_rows, headers=columns)
+
+# builder device start golden-hornet
+def start(name, background=True):
+	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
+
+	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
+
 	# Start virtual machine
+	machine_path = util.get_machine_path(name)
 	with open(vagrant_log_path, 'w+') as log:
-		sys.stdout.write('Booting VM.')
-		sys.stdout.flush()
+		if background == True:
+			sys.stdout.write('Starting VM in background. VM will be available in a few minutes. Check status with `builder device list`.')
+			sys.stdout.flush()
+		elif background == False:
+			sys.stdout.write('Starting VM.')
+			sys.stdout.flush()
+
 		#process = subprocess.Popen(['vagrant', 'up'], stdout=subprocess.PIPE, cwd=machine_path)
 		process = subprocess.Popen(['vagrant', 'up'], stdout=log, cwd=machine_path)
+
+		if background == False:
+			process.wait()
+			sys.stdout.write(' OK.\n')
+			sys.stdout.flush()
+			# TODO: Announce with voice "device <device-name> is now available."
+			None
+
+def ssh(name=None):
+	machine_path = util.get_machine_path(name)
+	address_ip4 = util.get_machine_address(name)
+	#device_ip = util.request_ip_address(name) # TODO: lookup the IP address of the device (and if it's a VM, make sure it's running!)
+	if address_ip4 != None:
+		username = 'vagrant'
+		subprocess.call(['ssh', '-l', username, '-o', 'StrictHostKeyChecking=no', address_ip4], cwd=machine_path)
+
+def restart(name):
+	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
+
+	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
+
+	# Start virtual machine
+	machine_path = util.get_machine_path(name)
+	with open(vagrant_log_path, 'w+') as log:
+		sys.stdout.write('Restarting VM.')
+		sys.stdout.flush()
+		#process = subprocess.Popen(['vagrant', 'up'], stdout=subprocess.PIPE, cwd=machine_path)
+		process = subprocess.Popen(['vagrant', 'reload'], stdout=log, cwd=machine_path)
 		process.wait()
 		sys.stdout.write(' OK.\n')
 		sys.stdout.flush()
 
-	# TODO: CLI style where you enter high level commands with minimum info to start a interactive questionairre prompting for variable values (but with defaults assigned), also skippable, and if skipped, added to "todos".
+def pause(name):
+	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	# TODO: Hello there.
-	# How are you?
-	# ...
-	# // this will trigger refactoring moving "TODO" on top of "Hello there". (Make a little continuous-running vim robot (scripted inline right in Vim. Make it a plugin!)).
-	#while True:
-		#output = process.stdout.readline()
-		#output = process.stdout.read(1)
-		#if output == '' and process.poll() is not None:
-			#break
-		#if output:
-			#sys.stdout.write(output)
-			#sys.stdout.flush()
-			#print output.strip(),
+	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
-def init_workspace_path(path=util.get_builder_root()):
+	# Start virtual machine
+	machine_path = util.get_machine_path(name)
+	with open(vagrant_log_path, 'w+') as log:
+		sys.stdout.write('Pausing VM.')
+		sys.stdout.flush()
+		#process = subprocess.Popen(['vagrant', 'up'], stdout=subprocess.PIPE, cwd=machine_path)
+		process = subprocess.Popen(['vagrant', 'suspend'], stdout=log, cwd=machine_path)
+		process.wait()
+		sys.stdout.write(' OK.\n')
+		sys.stdout.flush()
 
-	# make "./.builder/vagrant" folder if doesn't exist
-	# make "./.builder/vagrant/<vm-name>" folder for generated name
-	# generate ./.builder/vagrant/<vm-name>" Vagrantfile
-	#    - modify to set the name of the VM
-	#    - add bootstrap.sh
-	#         - run "builder init <vm-name>" on VM
+def stop(name):
+	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	builder_path = os.path.join(path, '.builder')
-	if not os.path.exists(builder_path):
-		print 'mkdir %s' % builder_path
-		os.makedirs(builder_path)
-	
-	devices_path = os.path.join(path, '.builder', 'devices')
-	if not os.path.exists(devices_path):
-		print 'mkdir %s' % devices_path 
-		os.makedirs(devices_path)
+	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
-def init_machine_path(name, path=util.get_builder_root()):
+	# Start virtual machine
+	machine_path = util.get_machine_path(name)
+	with open(vagrant_log_path, 'w+') as log:
+		sys.stdout.write('Stopping VM.')
+		sys.stdout.flush()
+		process = subprocess.Popen(['vagrant', 'halt'], stdout=log, cwd=machine_path)
+		process.wait()
+		sys.stdout.write(' OK.\n')
+		sys.stdout.flush()
 
-	init_workspace_path(path)
+def remove(name):
+	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
+	# TODO: Check if machine is running. If so, shutdown before continuing. Verify that it's shut down.
 
-	# Example filesystem:
-	#
-	# .builder
-	#     /devices
-	#         /fuzzy-koala
-	#             /vagrant    
-	#                 .Vagrantfile
+	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	vagrant_log_path = os.path.join(log_path, 'vagrant.log') 
+	# Destroy virtual machine
+	machine_path = util.get_machine_path(name)
+	if os.path.exists(machine_path):
+		with open(vagrant_log_path, 'w+') as log:
+			sys.stdout.write('Removing VM.')
+			sys.stdout.flush()
+			process = subprocess.Popen(['vagrant', 'destroy', '-f'], stdout=log, cwd=machine_path)
+			process.wait()
+			sys.stdout.write(' OK.\n')
+			sys.stdout.flush()
+		
+	# Recursively delete the machine path
+	# TODO: Check if machine is shutdown. It shouldn't be running when deleting the folder hierarchy.
+	if os.path.exists(machine_path):
+		sys.stdout.write('Deleting %s.' % machine_path)
+		sys.stdout.flush()
+		shutil.rmtree(machine_path)
+		sys.stdout.write(' OK.\n')
+		sys.stdout.flush()
 
-	machine_path = os.path.join(path, '.builder', 'devices', name)
-	if not os.path.exists(machine_path):
-		print 'mkdir %s' % machine_path
-		os.makedirs(machine_path)
+	# Remove device from registry (in SQLite database) if it exists
+	db_path = util.get_database_path()
+	db = TinyDB(db_path, default_table='builder')
+	Device = Query()
+	device = db.table('device').get(Device.name == name)
+	if device != None:
+		sys.stdout.write('Removing %s from database.' % name)
+		sys.stdout.flush()
 
-	#if virtual:
-	#vagrant_path = os.path.join(path, '.builder', 'devices', name, 'vagrant')
-	#if not os.path.exists(vagrant_path):
-	#	print 'mkdir %s' % vagrant_path
-	#	os.makedirs(vagrant_path)
-	
-	return machine_path
+		Device = Query()
+		#device = db.table('device').get(Device.name == name)
+		removed_device_ids = db.table('device').remove(Device.name == name)
+		if len(removed_device_ids) > 0:
+			sys.stdout.write(' OK.')
+			sys.stdout.flush()
+		else:
+			sys.stdout.write(' Error.')
+			sys.stdout.flush()
+
+	else:
+		# The device was not in the database
+		None
 
 if __name__ == "__main__":
 	init()

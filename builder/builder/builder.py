@@ -17,14 +17,14 @@ import util
 
 def builder(command=None):
 
-	print util.get_builder_root()
-
 	# Define command-line argument parser
 	parser = argparse.ArgumentParser(description='Process some integers.')
-	parser.add_argument("command")
-	parser.add_argument("option1", nargs='?', default=None)
-	parser.add_argument("option2", nargs='?', default=None)
-	parser.add_argument("-v", "--virtual", action="store_true", help="specify virtual machine (use with init)")
+	parser.add_argument('command')
+	parser.add_argument('option1', nargs='?', default=None)
+	parser.add_argument('option2', nargs='?', default=None)
+	# TODO: Make these optional arguments only show up for relevant argument trees.
+	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with init)')
+	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','builder'], help='specify role of builder context (use with init)')
 
 	# Parse arguments
 	args = None
@@ -67,17 +67,14 @@ def builder(command=None):
 		# builder init -v					Used to create and init a VM (via Vagrant).
 		# builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
 		# builder init desktop				Used to init a Builder env called desktop.
-		init(name=args.option1, virtual=args.virtual)
+		init(name=args.option1, role=args.role)
 	elif args.command == "start":
 		service.manage.start()
 		service.announce.start()
-	elif args.command == 'manage':
-		if args.option1 == 'start':
-			service.manage.start()
-		elif args.option1 == 'run':
-			service.manage.run()
-		elif args.option1 == 'stop':
-			service.manage.stop()
+	elif args.command == "stop":
+		service.manage.stop()
+		service.announce.stop()
+
 	elif args.command == 'announce':
 		if args.option1 == 'start':
 			service.announce.start()
@@ -85,6 +82,13 @@ def builder(command=None):
 			service.announce.run()
 		elif args.option1 == 'stop':
 			service.announce.stop()
+	elif args.command == 'manage':
+		if args.option1 == 'start':
+			service.manage.start()
+		elif args.option1 == 'run':
+			service.manage.run()
+		elif args.option1 == 'stop':
+			service.manage.stop()
 	elif args.command == 'monitor':
 		if args.option1 == 'start':
 			None
@@ -103,18 +107,28 @@ def builder(command=None):
 			None
 	elif args.command == 'device':
 		if args.option1 == 'list':
-			list()
+			device.list(args.option2)
 		elif args.option1 == 'add':
-			device.add(args.option2)
+			device.add(args.option2, virtual=args.virtual)
+		elif args.option1 == 'start':
+			device.start(args.option2)
+		elif args.option1 == 'ssh':
+			device.ssh(args.option2)
+		elif args.option1 == 'restart':
+			device.restart(args.option2)
+		elif args.option1 == 'pause':
+			device.pause(args.option2)
+		elif args.option1 == 'stop':
+			device.stop(args.option2)
 		elif args.option1 == 'remove':
-			None
+			device.remove(args.option2)
 	elif args.command == 'interface':
 		if args.option1 == 'list':
 			None
 		elif args.option1 == 'add':
-			None
+			interface.add(args.option2)
 		elif args.option1 == 'remove':
-			None
+			interface.remove(args.option2)
 	elif args.command == 'controller': # logic
 		if args.option1 == 'add':
 			None
@@ -128,11 +142,6 @@ def builder(command=None):
 
 	elif args.command == 'sync':
 		sync(args.option1)
-	elif args.command == 'ssh':
-		ssh(args.option1)
-	elif args.command == "echo":
-		echo(args.option1)
-
 
 	elif args.command == 'login':
 		None
@@ -144,6 +153,11 @@ def builder(command=None):
 		None
 	elif args.command == "clean":
 		clean()
+	
+	else:
+		print 'Error: I can\'t do that.'
+		print 'Reason: Unrecognized expression.'
+		print 'Hint: Run `builder help` to see what I can do.'
 
 # TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
 # TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.

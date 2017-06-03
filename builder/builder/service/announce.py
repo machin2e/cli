@@ -10,10 +10,8 @@ from datetime import datetime
 import json
 from ..util import util
 
-# Initialize logging
-#logger = None
-
 def start():
+
 	logger = util.logger(__name__)
 
 	sys.stdout.write('Starting broadcast service.')
@@ -23,34 +21,6 @@ def start():
 
 	# Log status
 	logger.info('Started broadcast service.')
-
-def stop():
-	sys.stdout.write('Stopping broadcast service.')
-
-	# Log status
-	logger = util.logger(__name__)
-	logger.info('Stopped broadcast service.')
-
-	# Locate pidfile (if it exists)
-	current_dir = os.getcwd()
-	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
-
-	# Read pid from pidfile
-	pidfile = open(pidfile_path, "r")
-	content = pidfile.readlines()
-	pidfile.close()
-	content = [x.strip() for x in content] # remove whitespace characters like `\n` at the end of each line
-	# print content
-	pid = int(content[0])
-
-	# Kill process
-	util.kill_proc_tree(pid)
-
-	# Delete pidfile
-	os.remove(pidfile_path)
-
-	# Status
-	sys.stdout.write(' OK.\n')
 
 def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 
@@ -100,17 +70,17 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 				if not fromaddr[0] in addresses: # Prevents reading packets from the host machine (i.e., broadcasts don't loop back)
 
 					# TODO: abstract this out based on 'requests' library abstraction level, then put it up on github and pip!
-					#if message.startswith("announce"):
-					if message.startswith("{"):
+					if message.startswith("announce"):
 						# Log status
 						logger.info("Response from %s:%s: %s" % (fromaddr[0], fromaddr[1], message))
 
 						# HACK
 						# TODO: rename 'device' to something better...
 						# TODO: don't populate this data here... create the structure on the sender's side
+						message = message[len('announce'):].strip()
 						device = json.loads(message)
 						device['address'] = {}
-						device['ip4'] = fromaddr[0]
+						device['address']['ip4'] = fromaddr[0]
 						device['time_created'] = datetime.utcnow().isoformat()
 						device['time_updated'] = datetime.utcnow().isoformat()
 
@@ -126,6 +96,24 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 						else:
 							del device['time_created']
 							device_table.update(device, Device.name == device['name'])
+
+						# Create device folder if doesn't already exist
+						builder_root = util.get_builder_root()
+
+						builder_folder = os.path.join(builder_root, '.builder')
+						if not os.path.exists(builder_folder):
+							print 'mkdir %s' % builder_folder
+							os.makedirs(builder_folder)
+
+						device_folder = os.path.join(builder_root, '.builder', 'devices')
+						if not os.path.exists(device_folder):
+							print 'mkdir %s' % device_folder 
+							os.makedirs(device_folder)
+
+						machine_folder = os.path.join(builder_root, '.builder', 'devices', device['name'])
+						if not os.path.exists(machine_folder):
+							print 'mkdir %s' % machine_folder
+							os.makedirs(machine_folder)
 
 					elif message.startswith("echo"):
 						response_message = message[len("echo") + 1:] # remove "echo " from start of string
@@ -145,6 +133,35 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 		s.sendto(broadcast_message, (broadcast_address, port)) # Works
 
 	s.close()
+
+def stop():
+
+	sys.stdout.write('Stopping broadcast service.')
+
+	# Log status
+	logger = util.logger(__name__)
+	logger.info('Stopped broadcast service.')
+
+	# Locate pidfile (if it exists)
+	current_dir = os.getcwd()
+	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
+
+	# Read pid from pidfile
+	pidfile = open(pidfile_path, "r")
+	content = pidfile.readlines()
+	pidfile.close()
+	content = [x.strip() for x in content] # remove whitespace characters like `\n` at the end of each line
+	# print content
+	pid = int(content[0])
+
+	# Kill process
+	util.kill_proc_tree(pid)
+
+	# Delete pidfile
+	os.remove(pidfile_path)
+
+	# Status
+	sys.stdout.write(' OK.\n')
 
 if __name__ == "__main__":
 	run()

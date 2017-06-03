@@ -1,18 +1,13 @@
 #!/bin/bash
 
-for argument in "$@"
-do
-	echo "$argument"
-	if [ "$argument" = "git" ]; then
-		echo "GIT"
-	fi;
-done
-
+# Uninstall current version
 pip uninstall builder -y
+
+# Check out latest version
+git checkout -- .
+git pull
+
+# Install latest version
 cd builder
 pip install .
 cd ..
-
-#git add *
-#git commit -m "Updated library."
-#git push

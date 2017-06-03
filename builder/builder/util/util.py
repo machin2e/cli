@@ -5,6 +5,7 @@ import time
 import netifaces
 import logging
 import pkg_resources
+from tinydb import TinyDB, Query
 
 # -----------------------------------------------------------------------------
 # Process Management
@@ -68,8 +69,83 @@ def is_builder_tree(path=os.getcwdu()):
 	else:
 		return False
 
+def init_workspace_path(path=get_builder_root()):
+
+	# make "./.builder/vagrant" folder if doesn't exist
+	# make "./.builder/vagrant/<vm-name>" folder for generated name
+	# generate ./.builder/vagrant/<vm-name>" Vagrantfile
+	#    - modify to set the name of the VM
+	#    - add bootstrap.sh
+	#         - run "builder init <vm-name>" on VM
+
+	builder_path = os.path.join(path, '.builder')
+	if not os.path.exists(builder_path):
+		print 'mkdir %s' % builder_path
+		os.makedirs(builder_path)
+	
+	devices_path = os.path.join(path, '.builder', 'devices')
+	if not os.path.exists(devices_path):
+		print 'mkdir %s' % devices_path 
+		os.makedirs(devices_path)
+
+def init_machine_path(name, path=get_builder_root()):
+
+	init_workspace_path(path)
+
+	# Example filesystem:
+	#
+	# .builder
+	#     /devices
+	#         /fuzzy-koala
+	#             /vagrant    
+	#                 .Vagrantfile
+
+	machine_path = os.path.join(path, '.builder', 'devices', name)
+	if not os.path.exists(machine_path):
+		print 'mkdir %s' % machine_path
+		os.makedirs(machine_path)
+
+	#if virtual:
+	#vagrant_path = os.path.join(path, '.builder', 'devices', name, 'vagrant')
+	#if not os.path.exists(vagrant_path):
+	#	print 'mkdir %s' % vagrant_path
+	#	os.makedirs(vagrant_path)
+	
+	return machine_path
+
 def get_machine_path(name, path=get_builder_root()):
 	return os.path.join(path, '.builder', 'devices', name)
+
+# TODO: Add to Device/Database class (serves as data access interface/map to device)
+def get_machine_address(name):
+	builder_db_path = get_database_path()
+	db = TinyDB(builder_db_path, default_table='builder')
+	device_table = db.table('device')
+
+	device = None
+
+	Device = Query()
+	device_element = device_table.search(Device.name == name)
+	if len(device_element) > 0:
+		device = device_element[0]
+	
+	return device['address']['ip4']
+
+# Get machines from database
+def get_machines():
+	builder_db_path = get_database_path()
+	db = TinyDB(builder_db_path, default_table='builder')
+	device_table = db.table('device')
+
+	#device = None
+
+	#Device = Query()
+	#device_element = device_table.search(Device.name == name)
+	#if len(device_element) > 0:
+		#device = device_element[0]
+	
+	#return device['address']['ip4']
+	return device_table.all()
 
 def logger(log_name):
 	"""
@@ -130,7 +206,7 @@ def get_builder_dir():
 
 # Load copy of file 
 def get_file(name):
-	return open(get_data_filename(name)).read().replace('%NAME%', name)
+	return open(get_data_filename(name)).read()
 
 # Load copy of Vagrantfile
 def get_vagrant_file(name):
@@ -163,46 +239,3 @@ def store_builderfile(builderfile, path=os.getcwdu()):
 	with open(path, 'w') as file:
 		file.write(builderfile_json)
 	#logger.info('---\n%s\n---' % db_dict_json)
-
-#
-# Networking
-#
-
-def request_ip_address(name=None):
-	PORT = 4445
-
-	broadcast_address = '192.168.1.255' # '<broadcast>'
-	response_timeout = 2.0 # seconds
-
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.bind(('', 0))
-	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-	# s.settimeout(response_timeout)
-	s.setblocking(0)
-
-	data = "list"
-	s.sendto(data, (broadcast_address, PORT)) # Works
-
-	response_start_time = int(round(time.time() * 1000))
-	current_time = 0
-	timeout = 2500
-
-	while current_time - response_start_time < timeout:
-		try:
-			data, fromaddr = s.recvfrom(1000)
-
-			# Deserialize JSON
-			response = json.loads(data)
-
-			# Check for matching device name. If it matches, return the IP address.
-			if (response['name'] == name):
-				#print "%s\t%s" % (data, fromaddr[0])
-				s.close()
-				return fromaddr[0]
-		except:
-			None
-		current_time = int(round(time.time() * 1000))
-	s.close()
-
-	return None
