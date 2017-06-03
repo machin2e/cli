@@ -1,12 +1,10 @@
+*Warning: Everything in this repository is under active development, so it is all subject to change.*
+
 ```
 ▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ 
 ▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ 
 ▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ 
 ```
-
-Version 0.0.1
-
-*Warning: Everything in this repository is under active development, so it is all subject to change.*
 
 ## Description
 
@@ -17,12 +15,12 @@ This repository contains:
 
 ## Usage (CLI) 
 
-**builder init**
+### `builder init`
 
 __Examples:__
 ```
 builder init						Used to initialize this folder (assigns a default name).
-builder init -v					Used to create and init a VM (via Vagrant).
+builder init -v						Used to create and init a VM (via Vagrant).
 builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
 builder init desktop				Used to init a Builder env called desktop.
 ```
@@ -40,3 +38,6 @@ monitor [broadcast|discover]
 
 log
 ```
+## Usage (Python API) 
+
+Coming soon!
