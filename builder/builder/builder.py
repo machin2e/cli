@@ -1,24 +1,14 @@
 #!/usr/bin/env python
 
-# The Builderfile is used to bootstrap the Builder daemon which manages
-# the device's configuration and allows it to be edited in real-time
-# from smartphone and when plugged in over USB as mass storage.
-
-# Create "Builderfile" that contains:
-# - UUID
-
-# This file can also be loaded as module to access the Builder API from a Python script.
-
 from imports import *
-import os
 import argparse
-import petname
+import api
 import util
 
 def builder(command=None):
 
 	# Define command-line argument parser
-	parser = argparse.ArgumentParser(description='Process some integers.')
+	parser = argparse.ArgumentParser(description='Builder command-line interpreter.')
 	parser.add_argument('command')
 	parser.add_argument('option1', nargs='?', default=None)
 	parser.add_argument('option2', nargs='?', default=None)
@@ -36,22 +26,6 @@ def builder(command=None):
 
 	# TODO: Search for all available "builder_*" files in toolchain and print error with command to repair the toolchain.
 	
-	"""
-	CLI interface:
-	
-	signup
-	login
-	help
-	note [add|remove|list]		Used to add, remove, or list notes for a device or environment/workspace/project.
-	assemble			Starts interactive self-assembly.
-	start [broadcast|discover]
-	status [broadcast|discover]
-	run [broadcast|discover]
-	stop [broadcast|discover]
-	monitor [broadcast|discover]
-
-	log
-	"""
 
 	if not args.command == 'init':
 		if not util.is_builder_tree():
@@ -60,21 +34,42 @@ def builder(command=None):
 			print 'Hint: Run `builder init`.' 
 			return
 
+	# TODO: make sure `builder init` was called prior to other commands!
+
+	if args.command == 'ports':
+		device = api.Device()
+		for port in device.get_ports():
+			print port.mode
+			print port.direction
+			print port.voltage
 
 	if args.command == "init":
-		# Examples:
-		# builder init						Used to initialize this folder (assigns a default name).
-		# builder init -v					Used to create and init a VM (via Vagrant).
-		# builder init fiery-fox -v			Used to initialize a new VM named fiery-fox.
-		# builder init desktop				Used to init a Builder env called desktop.
 		init(name=args.option1, role=args.role)
+
+	elif args.command == 'status':
+		# TODO: Print current status. Ex: 'running', 'paused', 'stopped'
+		None	
+
 	elif args.command == "start":
+
+		print '▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ '
+		print '▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ '
+		print '▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ '
+
 		service.manage.start()
 		service.announce.start()
+	elif args.command == "pause":
+		service.manage.stop()
+		service.announce.stop()
+		# TODO: Suspend VMs! `vagrant suspend` (Y/N)
+	elif args.command == "resume":
+		service.manage.start()
+		service.announce.start()
+		# TODO: Resume VMs! `vagrant resume` (if suspended)
 	elif args.command == "stop":
 		service.manage.stop()
 		service.announce.stop()
-
+		# TODO: Start VMs! `vagrant suspend`
 	elif args.command == 'announce':
 		if args.option1 == 'start':
 			service.announce.start()
@@ -108,6 +103,9 @@ def builder(command=None):
 	elif args.command == 'device':
 		if args.option1 == 'list':
 			device.list(args.option2)
+		elif args.option1 == 'search':
+			# TODO: Search device registry for a device name/description matching specified string/regex
+			None
 		elif args.option1 == 'add':
 			device.add(args.option2, virtual=args.virtual)
 		elif args.option1 == 'start':
@@ -130,15 +128,33 @@ def builder(command=None):
 		elif args.option1 == 'remove':
 			interface.remove(args.option2)
 	elif args.command == 'controller': # logic
-		if args.option1 == 'add':
+		if args.option1 == 'list':
+			None
+		elif args.option1 == 'add':
 			None
 		elif args.option1 == 'remove':
 			None
 	elif args.command == 'view':
-		None
-	elif args.command == 'design': # CAD design file
+		if args.option1 == 'list':
+			None
+		elif args.option1 == 'add':
+			None
+		elif args.option1 == 'remove':
+			None
+	elif args.command == 'material': # Alt: 'design', 'asset' (CAD design file)
 		None
 
+	# builder port add digital,output,ttl --interface servo
+	# builder port add digital,output,ttl --interface servo
+	# builder port add digital,output,ttl --interface servo
+
+	# builder interface deploy|assign <device-name>
+
+	# builder interface assemble|install
+
+	# builder assemble|install
+
+	# builder deploy
 
 	elif args.command == 'sync':
 		sync(args.option1)
@@ -153,6 +169,9 @@ def builder(command=None):
 		None
 	elif args.command == "clean":
 		clean()
+
+	elif args.command == "version":
+		api.version()
 	
 	else:
 		print 'Error: I can\'t do that.'
