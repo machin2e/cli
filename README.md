@@ -19,7 +19,7 @@ This repository contains:
 
 #### `builder init`
 
-__Examples:__
+_Examples:_
 ```
 builder init						Used to initialize this folder (assigns a default name).
 builder init -v						Used to create and init a VM (via Vagrant).
