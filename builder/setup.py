@@ -15,7 +15,8 @@ setup(
 		'netifaces',
 		'portalocker',
                 'watchdog',
-                'tinydb'
+                'tinydb',
+                'tabulate'
 	],
 	entry_points = {
 		'console_scripts': ['builder=builder.command_line:main'],

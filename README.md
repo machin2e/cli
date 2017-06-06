@@ -54,6 +54,10 @@ monitor [broadcast|discover]
 
 log
 ```
-## Usage (Python API) 
+## API
+
+This repository contains the Python API.
+
+### Usage
 
 Coming soon!

@@ -5,6 +5,8 @@ import argparse
 import api
 import util
 
+import os
+
 def builder(command=None):
 
 	# Define command-line argument parser
@@ -36,12 +38,17 @@ def builder(command=None):
 
 	# TODO: make sure `builder init` was called prior to other commands!
 
-	if args.command == 'ports':
-		device = api.Device()
+	# TODO: during `builder init`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
+	# TODO: don't worry about filesystem too much for now... just load model (proxy for download), then update state through API... DO THIS IN CONTROLLER? NOT CLI? PROBALBY!!!!!!!
+	if args.command == 'port':
+		#path = os.path.join(util.get_builder_root(), '_robot', 'motors', 'right-servo', 'model-device-builder.yaml')
+		path = os.path.join(util.get_builder_root(), '.builder', 'devices', 'builder-8.0.0.yaml')
+		device = api.Device(model_uri=path)
 		for port in device.get_ports():
 			print port.mode
 			print port.direction
 			print port.voltage
+		print port.states
 
 	if args.command == "init":
 		init(name=args.option1, role=args.role)
@@ -55,6 +62,8 @@ def builder(command=None):
 		print '▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ '
 		print '▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ '
 		print '▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ '
+
+		# TODO: for hosts, load their own device file, and the device files for connected peripherals, their controllers, etc.; init in-memory state of board
 
 		service.manage.start()
 		service.announce.start()
@@ -127,6 +136,9 @@ def builder(command=None):
 			interface.add(args.option2)
 		elif args.option1 == 'remove':
 			interface.remove(args.option2)
+		elif args.option1 == 'compose':
+			# TODO: Composes multiple interfaces under a new interface. Generates interface file with dependencies.
+			None
 	elif args.command == 'controller': # logic
 		if args.option1 == 'list':
 			None
@@ -155,6 +167,10 @@ def builder(command=None):
 	# builder assemble|install
 
 	# builder deploy
+
+	elif args.command == 'log':
+		# TODO: builder [device <name>] log <announce|manage|command>
+		None
 
 	elif args.command == 'sync':
 		sync(args.option1)

@@ -1,6 +1,7 @@
 import os, sys
 import psutil
-import socket, json
+import socket
+import json, yaml
 import time
 import netifaces
 import logging
@@ -34,6 +35,23 @@ def get_inet_addresses():
 			if not i['addr'] == None:
 				addresses.append(i['addr'])
 	return addresses
+
+# -----------------------------------------------------------------------------
+# File I/O
+# -----------------------------------------------------------------------------
+
+def load_yaml_file(path):
+    # TODO: load .yaml file with model for particular (id, version) and populate this model... create __init__ to do that... multiple constructors!
+    #device_model_path = 'model-device-builder.yaml'
+    yaml_object = None
+
+    with open(path, 'r') as file:
+        yaml_string = file.read()
+        yaml_object = yaml.load(yaml_string)
+        #print device_model
+        return yaml_object
+
+    return None
 
 # -----------------------------------------------------------------------------
 # File System Management
