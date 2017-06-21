@@ -1,0 +1,30 @@
+# models are only adjacent to controller files
+
+#parent:
+#	id: <uuid>
+#	version: <version>
+
+id: <uuid>
+name: servo
+ports:
+    - id: <uuid>
+      #label: ground
+      #number: 1
+      mode: digital
+      direction: output
+      voltage: input # TODO: Support voltage ranges
+      #power: volts(5)
+      #power: volts(5-10)
+      #power: common
+    - id: <uuid>
+      #label: signal
+      #number: 2
+      mode: digital
+      direction: output
+      voltage: input
+    - id: <uuid>
+      #label: power
+      #number: 3
+      mode: digital
+      direction: output
+      voltage: input

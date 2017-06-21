@@ -1,0 +1,292 @@
+# models are only adjacent to controller files
+uuid: 18ce7b13-6ddb-43ac-b4dd-b9293e0da554
+name: Raspberry Pi 3
+version: 1.0.0
+ports:
+    - id: <uuid>
+      number: 1
+      states:
+          - mode: [power]
+            direction: [output]
+            voltage: [3.3v]
+    - id: <uuid>
+      number: 2
+      states:
+          - mode: [power]
+            direction: [output]
+            voltage: [5v]
+    - id: <uuid>
+      number: 3
+      label: SDA
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [3.3v]
+        - mode: [i2c(sda)]
+          direction: [bidirectional]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 4
+      states:
+          - mode: [power]
+            direction: [output]
+            voltage: [5v]
+    - id: <uuid>
+      number: 5
+      label: SCL
+      states:
+        - mode: [i2c(scl)]
+          direction: [bidirectional]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 6
+      states:
+        - mode: [power(ground)] # power(ground)
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 7
+      label: D0
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 8
+      label: GPIO14
+      states:
+        - mode: [uart(tx)]
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 9
+      states:
+        - mode: [power(ground)]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 10
+      label: GPIO15
+      states:
+        - mode: [uart(rx)]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 11
+      label: GPIO17
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 12
+      label: D9/A0
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+        - mode: [pulse-width-modulation]
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 13
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 14
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 15
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 16
+      label: D10/A1
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 17
+      states:
+        - mode: [power]
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 18
+      label: D11/A2
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 19
+      states:
+        - mode: [spi(mosi)]
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 20
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 21
+      states:
+        - mode: [spi(miso)]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 22
+      label: D12/A3
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 23
+      states:
+        - mode: [spi(sck)]
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 24
+      states:
+        - mode: [spi(ce)] # CE0
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 25
+      states:
+        - mode: [power] # power(ground)
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 26
+      states:
+        - mode: [spi(ce)] # CE1
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid> # DO NOT USE
+      number: 27
+      states: []
+    - id: <uuid> # DO NOT USE
+      number: 28
+      states: []
+    - id: <uuid>
+      number: 29
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 30
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 31
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 32
+      label: D13/A4
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 33
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [pwm] # PWM2
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 34
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 35
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [pwm] # PWM2
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 36
+      label: D14/A5
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+        - mode: [pwm] # PWM2
+          direction: [output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 37
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 38
+      label: D15/A6
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]
+    - id: <uuid>
+      number: 39
+      states:
+        - mode: [power]
+          direction: [bidirectional]
+          voltage: [0v]
+    - id: <uuid>
+      number: 40
+      label: D16/A7
+      states:
+        - mode: [digital]
+          direction: [input, output]
+          voltage: [3.3v]
+        - mode: [adc]
+          direction: [input]
+          voltage: [3.3v]

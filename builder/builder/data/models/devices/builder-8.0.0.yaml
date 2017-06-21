@@ -1,0 +1,110 @@
+# models are only adjacent to controller files
+uuid: 18ce7b13-6ddb-43ac-b4dd-b9293e0da554
+name: builder
+version: 8.0.0
+ports:
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 1
+      states: &states
+          - mode: [digital]
+            direction: [input, output, bidirectional]
+            voltage: [0v, 3.3v, 5v]
+          - mode: [analog]
+            direction: [input, output]
+            voltage: [3.3v, 5v]
+          - mode: [power]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [power]
+            direction: [bidirectional]
+            voltage: [0v]
+          - mode: [i2c(scl)]
+            direction: [bidirectional]
+            voltage: [5v]
+          - mode: [i2c(sda)]
+            direction: [bidirectional]
+            voltage: [5v]
+          - mode: [spi(sclk)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [spi(mosi)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [spi(miso)]
+            direction: [input]
+            voltage: [3.3v, 5v]
+          - mode: [spi(ss)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [uart(rx)]
+            direction: [input]
+            voltage: [3.3v, 5v]
+          - mode: [uart(tx)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 2
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 3
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 4
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 5
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 6
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 7
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 8
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 9
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 10
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 11
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 12
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 13
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 14
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 15
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 16
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 17
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 18
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 19
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 21
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 22
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 23
+      states: *states
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 24
+      states: *states

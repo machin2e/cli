@@ -49,9 +49,21 @@ supported_voltages = device.get_ports()[0].get_model().get_voltages()
 
 is_supported_config = device.get_ports()[0].get_model().get_voltages()
 
+----
 
 device.ports.get(number=3)      # Low-level API (for on-device, calls into platform API)
 device.ports.get('adc')         # High-level API (for controllers)
+
+----
+
+devices                                # list of available devices
+device.ports()                         # list of ports attached to the device
+device.ports(3, 4)                     # list of ports attached to the device
+device.ports(3, 4).voltage
+device.ports(3, 4).get('mode', 'voltage')
+device.ports(3, 4).set('mode': 'digital', 'voltage': '5v')
+
+----
 
 device.ports.get('adc').set(adc=844)
     device.ports.get('adc').sample(adc=844)
@@ -62,6 +74,8 @@ device.ports.get('adc').publish(adc=844)
 device.ports.get('adc').publish(voltage=2.4)
 device.ports.get('adc').publish(voltage=2.4)
 adc_value_stream = device.ports.get('adc').subscribe()
+
+// path_config = assemble(device_001, device_002)
 
 device.ports.get(3).voltage
 device.ports.get(3).validate(mode='digital', direction='input', voltage='5v')

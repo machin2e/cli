@@ -7,7 +7,8 @@ setup(
 	author="Builder Network",
 	zip_safe=False,
 	packages=find_packages(),
-	package_data = { 'builder': [ 'data/*' ] },
+	package_data = { 'builder': [ 'data/*', 'data/models/devices/*.yaml' ] },
+        #data_files = [('data/models/devices', [ '*.yaml' ])],
 	install_requires = [
 		'petname',
 		'pexpect',

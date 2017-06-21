@@ -57,6 +57,20 @@ def load_yaml_file(path):
 # File System Management
 # -----------------------------------------------------------------------------
 
+def get_file_list(path=os.getcwdu()):
+	file_names = os.listdir(path)
+	return file_names
+
+# Checks if the current directory contains the specified file
+# If so, returns the path containing the file. If not, returns None.
+def contains_file(path=os.getcwdu(), filename=None):
+	# TODO: rename to locate_file
+	file_path = os.path.join(path, filename)
+	if os.path.exists(file_path):
+		return path
+	else:
+		return None
+
 # Checks if the current directory or parent directory contains the specified file, recursively, starting with the specified path.
 # If so, returns the path containing the file.
 def parent_contains(filename, path=os.getcwdu(), recursive=True):
