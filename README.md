@@ -13,9 +13,13 @@ This repository contains:
 
 Install with the following command:
 
+```
 pip ...
+```
 
+```
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+```
 
 ## Device Model File Format
 
