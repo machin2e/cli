@@ -1,0 +1,41 @@
+# models are only adjacent to controller files
+
+#parent:
+#	id: <uuid>
+#	version: <version>
+
+id: <uuid>
+name: servo
+ports:
+    - id: <uuid>
+      #label: ground
+      #number: 1
+      mode: power
+      direction: input
+      voltage: 3.3v # TODO: Support voltage ranges
+      #states:
+      #    - mode: digital
+      #      direction: output
+      #      voltage: 3.3v
+
+      #power: volts(5)
+      #power: volts(5-10)
+      #power: common
+    - id: <uuid>
+      #label: signal
+      #number: 2
+      mode: pulse-width-modulation # alt: pwm
+      direction: input # alt: in
+      voltage: 3.3v
+    - id: <uuid>
+      #label: power
+      #number: 3
+      mode: power
+      direction: bidirectional # alt: bi
+      voltage: 0v
+      # power: voltage(3.3v)
+      # power: common
+      #
+      # Can have port: mode, direction, voltage (static assignment)
+      # Can have port: [mode], [direction], [voltage] (one set of constraints)
+      # Can have port: states: - ... (constraints)

@@ -5,10 +5,13 @@ version: 1.0.0
 ports:
     - id: <uuid>
       number: 1
-      states:
+      states: # TODO: rename to 'modes' or 'configurations'
           - mode: [power]
             direction: [output]
             voltage: [3.3v]
+            #- function/provides/service: [power]
+            #direction: [output] # or 'out'
+            #power: [voltage(3.3v), common]
     - id: <uuid>
       number: 2
       states:
@@ -41,7 +44,7 @@ ports:
     - id: <uuid>
       number: 6
       states:
-        - mode: [power(ground)] # power(ground)
+        - mode: [power] # power(ground)
           direction: [bidirectional]
           voltage: [0v]
     - id: <uuid>
@@ -61,7 +64,7 @@ ports:
     - id: <uuid>
       number: 9
       states:
-        - mode: [power(ground)]
+        - mode: [power]
           direction: [bidirectional]
           voltage: [0v]
     - id: <uuid>

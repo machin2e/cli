@@ -3,12 +3,17 @@ setup(
 	name="builder",
 	description="Builder",
 	version="0.0.1",
-	url="https://github.com/buildernetwork/builder-python",
-	author="Builder Network",
+	url="https://github.com/machineeeee/builder-python",
+	author="machineee",
 	zip_safe=False,
 	packages=find_packages(),
-	package_data = { 'builder': [ 'data/*', 'data/models/devices/*.yaml' ] },
-        #data_files = [('data/models/devices', [ '*.yaml' ])],
+	package_data = { 'builder': [ 'data/*' ] },
+	#package_data = { 'builder': [ 'data/*', 'data/models/devices/*.yaml' ] },
+        #data_files = [
+            #('builder/data', [ 'Vagrantfile', 'public_key', 'private_key', 'bootstrap.sh' ]),
+            #('builder/data/models', [ '*' ]),
+            #('builder/data/models/devices', [ '*.yaml' ])
+        #],
 	install_requires = [
 		'petname',
 		'pexpect',

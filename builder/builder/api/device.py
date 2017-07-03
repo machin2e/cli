@@ -12,18 +12,35 @@ class Device(object):
         Args:
             model_path (str): path to a model yaml file.
         """
+        self.name = None
         self.ports = []
 
         print model_path
         if model_path != None:
             model = util.load_yaml_file(model_path)
+            
+            # Load name from device model file
+            if 'name' in model:
+                self.name = model['name']
 
+            # Load ports from device model file
             for port_model in model['ports']:
                 #print port_model['number']
 
                 port = Port()
 
-                if 'states' in port_model:
+                # Parse port state space:
+                # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
+                # 2. search for 'states' list
+
+                if 'mode' in port_model and 'direction' in port_model and 'voltage' in port_model:
+                    state = {}
+                    state['mode'] = [port_model['mode']]
+                    state['direction'] = [port_model['direction']]
+                    state['voltage'] = [port_model['voltage']]
+                    port.states.append(state)
+
+                elif 'states' in port_model:
                     for state in port_model['states']:
                         port.states.append(state)
                         #print state['mode']

@@ -1,10 +1,12 @@
 *Warning: Everything in this repository is under active development, so it is all subject to change.*
 
-```
-▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ 
-▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ 
-▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ 
-```
+#```
+#▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ 
+#▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ 
+#▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ 
+#```
+
+# Builder
 
 ## Description
 
@@ -13,9 +15,31 @@ This repository contains:
 1. Builder CLI
 2. Builder Python API
 
+## Installation
+
+Install with the following command:
+
+pip ...
+
+sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+## Device Model File Format
+
+Device model files need to be formatted in [[YAML]] markup. These files have the `*.yaml` extension.
+
+An example device model file is given below (this is the same as <path>):
+
+```
+YAML device file here...
+```
+
 ## Command Line Interface
 
 ### Usage
+
+```
+builder connect --model raspberry-pi-3 --model machineee/generic-servo --model ir-rangefinder --model ir-rangefinder
+```
 
 #### `builder init`
 
