@@ -11,10 +11,10 @@ This repository contains:
 
 ## Installation
 
-Install with the following command:
+Install with the following command. You may want to prefix the command with `sudo`.
 
 ```
-pip ...
+pip install git+https://github.com/machineeeee/builder-python
 ```
 
 ```
