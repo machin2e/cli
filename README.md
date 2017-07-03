@@ -17,6 +17,7 @@ Install with the following command. You may want to prefix the command with `sud
 pip install git+https://github.com/machineeeee/builder-python
 ```
 
+TODO: Allow one line install using the following pattern (similar to brew):
 ```
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 ```
