@@ -1,0 +1,46 @@
+# models are only adjacent to controller files
+name: Builder
+version: 1.0.0
+ports:
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 1
+      states: &states
+          - mode: [digital]
+            direction: [input, output, bidirectional]
+            voltage: [0v, 3.3v, 5v]
+          - mode: [analog]
+            direction: [input, output]
+            voltage: [3.3v, 5v]
+          - mode: [power]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [power]
+            direction: [bidirectional]
+            voltage: [0v]
+          - mode: [i2c(scl)]
+            direction: [bidirectional]
+            voltage: [5v]
+          - mode: [i2c(sda)]
+            direction: [bidirectional]
+            voltage: [5v]
+          - mode: [spi(sclk)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [spi(mosi)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [spi(miso)]
+            direction: [input]
+            voltage: [3.3v, 5v]
+          - mode: [spi(ss)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+          - mode: [uart(rx)]
+            direction: [input]
+            voltage: [3.3v, 5v]
+          - mode: [uart(tx)]
+            direction: [output]
+            voltage: [3.3v, 5v]
+    - id: 8e78ea34-03b9-42f2-880a-cf80ba130f6d
+      number: 2
+      states: *states

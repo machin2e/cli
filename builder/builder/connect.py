@@ -128,67 +128,138 @@ def determine_port_dependency(port):
 	
 	# TODO: determine_compatible_interfaces(arduino, arduino)
 
-	for state in port.states:
 
-		port_dependency = {
-				'mode': [],
-				'direction': [],
-				'voltage': []
-		}
+# TODO: expand state combinatorics and check each of them... to allow connecting two Builders, for example...
 
-		# Determine mode compatibility
-		# TODO: iterate through all available elements of array (for devices like Pi that have multiple states/configs per port)
-		# TODO: change 'mode' to 'role' OR 'function', 'service', 'purpose'?
-		if 'power' in state['mode']:
-			port_dependency['mode'].append('power')
-		elif 'digital' in state['mode']:
-			port_dependency['mode'].append('digital')
-		elif 'analog' in state['mode']: # adc?
-			port_dependency['mode'].append('analog')
-		elif 'resistive-touch' in state['mode']:
-			port_dependency['mode'].append('resistive-touch')
-		elif 'pulse-width-modulation' in state['mode']:
-			port_dependency['mode'].append('pulse-width-modulation') # alt: PWM, pwm
-		elif 'i2c(scl)' in state['mode']: # alt: I2C(SCL)
-			port_dependency['mode'].append('i2c(scl)')
-		elif 'i2c(sda)' in state['mode']: # alt: I2C(SDA)
-			port_dependency['mode'].append('i2c(sda)')
-		elif 'spi(sclk)' in state['mode']:
-			port_dependency['mode'].append('spi(sclk)')
-		elif 'spi(mosi)' in state['mode']:
-			port_dependency['mode'].append('spi(mosi)')
-		elif 'spi(miso)' in state['mode']:
-			port_dependency['mode'].append('spi(miso)')
-		elif 'spi(ss)' == state['mode']:
-			port_dependency['mode'].append('spi(ss)')
-		elif 'uart(tx)' in state['mode']:
-			port_dependency['mode'].append('uart(rx)')
-		elif 'uart(rx)' in state['mode']:
-			port_dependency['mode'].append('uart(tx)')
+	for state2 in port.states:
 
-		# Determine direction compatibility
-		# TODO: Double-check this logic... it's not complete!
-		if 'input' in state['direction']:
-			port_dependency['direction'].append('output')
-		elif 'output' in state['direction']:
-			port_dependency['direction'].append('input')
-		elif 'bidirectional' in state['direction']:
-			port_dependency['direction'].append('bidirectional')
+		state_list = determine_state_list(state2)
 
-		# Determine power compatibility
-		# TODO: Support voltage ranges! e.g., [3.3v, 5v]
-		if '3.3v' in state['voltage']:
-			port_dependency['voltage'].append('3.3v')
-		elif '5v' in state['voltage']:
-			port_dependency['voltage'].append('5v')
-		elif '0v' in state['voltage']:
-			port_dependency['voltage'].append('0v')
+		for state in state_list:
 
-		# TODO: verify validity before adding to dependency/compatibility list
-		port_dependencies.append(port_dependency)
+			# port_dependency = {
+					# 'mode': [],
+					# 'direction': [],
+					# 'voltage': []
+			# }
+
+			port_dependency = {
+					'mode': None,
+					'direction': None,
+					'voltage': None
+			}
+
+			# Determine mode compatibility
+			# TODO: iterate through all available elements of array (for devices like Pi that have multiple states/configs per port)
+			# TODO: change 'mode' to 'role' OR 'function', 'service', 'purpose'?
+			if 'power' == state['mode']:
+				port_dependency['mode'] = 'power'
+			elif 'digital' == state['mode']:
+				port_dependency['mode'] = 'digital'
+			elif 'analog' == state['mode']: # adc?
+				port_dependency['mode'] = 'analog'
+			elif 'resistive-touch' == state['mode']:
+				port_dependency['mode'] = 'resistive-touch'
+			elif 'pulse-width-modulation' == state['mode']:
+				port_dependency['mode'] = 'pulse-width-modulation' # alt: PWM, pwm
+			elif 'i2c(scl)' == state['mode']: # alt: I2C(SCL)
+				port_dependency['mode'] = 'i2c(scl)'
+			elif 'i2c(sda)' == state['mode']: # alt: I2C(SDA)
+				port_dependency['mode'] = 'i2c(sda)'
+			elif 'spi(sclk)' == state['mode']:
+				port_dependency['mode'] = 'spi(sclk)'
+			elif 'spi(mosi)' == state['mode']:
+				port_dependency['mode'] = 'spi(mosi)'
+			elif 'spi(miso)' == state['mode']:
+				port_dependency['mode'] = 'spi(miso)'
+			elif 'spi(ss)' == state['mode']:
+				port_dependency['mode'] = 'spi(ss)'
+			elif 'uart(tx)' == state['mode']:
+				port_dependency['mode'] = 'uart(rx)'
+			elif 'uart(rx)' == state['mode']:
+				port_dependency['mode'] = 'uart(tx)'
+
+			# Determine direction compatibility
+			# TODO: Double-check this logic... it's not complete!
+			if 'input' == state['direction']:
+				port_dependency['direction'] = 'output'
+			elif 'output' == state['direction']:
+				port_dependency['direction'] = 'input'
+			elif 'bidirectional' == state['direction']:
+				port_dependency['direction'] = 'bidirectional'
+
+			# Determine power compatibility
+			# TODO: Support voltage ranges! e.g., [3.3v, 5v]
+			if '3.3v' == state['voltage']:
+				port_dependency['voltage'] = '3.3v'
+			elif '5v' == state['voltage']:
+				port_dependency['voltage'] = '5v'
+			elif '0v' == state['voltage']:
+				port_dependency['voltage'] = '0v'
+
+			# # Determine mode compatibility
+			# # TODO: iterate through all available elements of array (for devices like Pi that have multiple states/configs per port)
+			# # TODO: change 'mode' to 'role' OR 'function', 'service', 'purpose'?
+			# if 'power' in state['mode']:
+				# port_dependency['mode'].append('power')
+			# elif 'digital' in state['mode']:
+				# port_dependency['mode'].append('digital')
+			# elif 'analog' in state['mode']: # adc?
+				# port_dependency['mode'].append('analog')
+			# elif 'resistive-touch' in state['mode']:
+				# port_dependency['mode'].append('resistive-touch')
+			# elif 'pulse-width-modulation' in state['mode']:
+				# port_dependency['mode'].append('pulse-width-modulation') # alt: PWM, pwm
+			# elif 'i2c(scl)' in state['mode']: # alt: I2C(SCL)
+				# port_dependency['mode'].append('i2c(scl)')
+			# elif 'i2c(sda)' in state['mode']: # alt: I2C(SDA)
+				# port_dependency['mode'].append('i2c(sda)')
+			# elif 'spi(sclk)' in state['mode']:
+				# port_dependency['mode'].append('spi(sclk)')
+			# elif 'spi(mosi)' in state['mode']:
+				# port_dependency['mode'].append('spi(mosi)')
+			# elif 'spi(miso)' in state['mode']:
+				# port_dependency['mode'].append('spi(miso)')
+			# elif 'spi(ss)' == state['mode']:
+				# port_dependency['mode'].append('spi(ss)')
+			# elif 'uart(tx)' in state['mode']:
+				# port_dependency['mode'].append('uart(rx)')
+			# elif 'uart(rx)' in state['mode']:
+				# port_dependency['mode'].append('uart(tx)')
+
+			# # Determine direction compatibility
+			# # TODO: Double-check this logic... it's not complete!
+			# if 'input' in state['direction']:
+				# port_dependency['direction'].append('output')
+			# elif 'output' in state['direction']:
+				# port_dependency['direction'].append('input')
+			# elif 'bidirectional' in state['direction']:
+				# port_dependency['direction'].append('bidirectional')
+
+			# # Determine power compatibility
+			# # TODO: Support voltage ranges! e.g., [3.3v, 5v]
+			# if '3.3v' in state['voltage']:
+				# port_dependency['voltage'].append('3.3v')
+			# elif '5v' in state['voltage']:
+				# port_dependency['voltage'].append('5v')
+			# elif '0v' in state['voltage']:
+				# port_dependency['voltage'].append('0v')
+
+			# TODO: verify validity before adding to dependency/compatibility list
+			port_dependencies.append(port_dependency)
 	
 	print '\t%s' % port_dependencies
 
+	return port_dependencies
+
+# TODO: integrate with determine_port_dependencies(port) and rename to determine_dependencies(...) and check type to determine functionality
+def determine_device_port_dependencies(model):
+	port_dependencies = { 'ports': {} }
+	print 'Port Dependencies for %s:' % model.name
+	for port in model.get_ports():
+		port_dependency = determine_port_dependency(port)
+		port_dependencies['ports'][port] = port_dependency
+	print ''
 	return port_dependencies
 
 # TODO: test_device_compatibility(device, device)
@@ -220,12 +291,13 @@ def connect_models(models):
 
 	port_dependencies = {}
 	for model in models:
-		port_dependencies[model] = { 'ports': {} }
-		print 'Port Dependencies for %s:' % model.name
-		for port in model.get_ports():
-			port_dependency = determine_port_dependency(port)
-			port_dependencies[model]['ports'][port] = port_dependency
-		print ''
+		port_dependencies[model] = determine_device_port_dependencies(model)
+		# port_dependencies[model] = { 'ports': {} }
+		# print 'Port Dependencies for %s:' % model.name
+		# for port in model.get_ports():
+			# port_dependency = determine_port_dependency(port)
+			# port_dependencies[model]['ports'][port] = port_dependency
+		# print ''
 
 	for model in models:
 
@@ -261,6 +333,17 @@ def connect_models(models):
 	
 	print 'TODO: Generate path YAML file.'
 
+# TODO?: change to determine_state_list(port)
+def determine_state_list(state):
+	# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
+	# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+	port_configuration_list = [] # TODO: compute these...
+	for mode in state['mode']:
+		for direction in state['direction']:
+			for voltage in state['voltage']:
+				port_configuration_list.append({ 'mode': mode, 'direction': direction, 'voltage': voltage })
+	return port_configuration_list
+
 # TODO: locate_compatible_interface(...)
 def locate_compatible_port(source_device, source_port, source_port_dependencies, devices):
 	"""
@@ -273,36 +356,56 @@ def locate_compatible_port(source_device, source_port, source_port_dependencies,
 
 	# compatible_port_list[0]['port']
 	# compatible_port_list[0]['state']
-	compatible_port_list = []
+	compatible_port_list = {}
+	# compatible_port_list[other_device] = []
 	for device in devices:
 
 		# Prevent attempt to search for compatible ports on the same device
 		# TODO: Add option to enable searching on the same device
-		if device == source_device:
-			continue
+		# if device == source_device:
+			# continue
+
+		# Initialize storage for compatible ports on other device
+		compatible_port_list[device] = {}
 
 		# print 'Port Dependencies for %s:' % model.name
 		for port in device.ports:
+
 			for state in port.states:
 
 				# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
 				# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
-				port_configuration_list = [] # TODO: compute these...
-				for mode in state['mode']:
-					for direction in state['direction']:
-						for voltage in state['voltage']:
-							port_configuration_list.append({ 'mode': mode, 'direction': direction, 'voltage': voltage })
+				port_configuration_list = determine_state_list(state)
+				# for mode in state['mode']:
+					# for direction in state['direction']:
+						# for voltage in state['voltage']:
+							# port_configuration_list.append({ 'mode': mode, 'direction': direction, 'voltage': voltage })
 
 				# Determine compatible ports
 				for port_dependency in source_port_dependencies:
 					for port_configuration in port_configuration_list:
-						if port_configuration['mode'] in port_dependency['mode'] and port_configuration['direction'] in port_dependency['direction'] and port_configuration['voltage'] in port_dependency['voltage']:
-							compatible_port_list.append({ 'port': port, 'device': device, 'state': port_configuration })
+						if port_configuration['mode'] == port_dependency['mode'] and port_configuration['direction'] == port_dependency['direction'] and port_configuration['voltage'] == port_dependency['voltage']:
 
-	# Print the compatible ports
+							# Just-in-time initialize storage for compatible port states on other device's port to empty list
+							if not port in compatible_port_list[device]:
+								compatible_port_list[device][port] = []
+
+							compatible_port_list[device][port].append({ 'port': port, 'state': port_configuration })
+
+	# Print the compatible ports (if any).
+	# For devices that provide no compatible ports, print 'None'.
 	print '\t\tCompatible Ports:'
-	for compatible_port in compatible_port_list:
-		print '\t\t\tPort %s on %s: %s, %s, %s' % (compatible_port['port'].number, compatible_port['device'].name, compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
+	for device in compatible_port_list:
+
+		if len(compatible_port_list[device]) == 0:
+			print '\t\t\t%s: None' % device.name
+		else:
+			print '\t\t\t%s:' % device.name
+
+		for port in compatible_port_list[device]:
+			print '\t\t\t\tPort %s:' % port.number
+			for compatible_port in compatible_port_list[device][port]:
+				print '\t\t\t\t\t%s, %s, %s' % (compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
 
 	return compatible_port_list 
 
