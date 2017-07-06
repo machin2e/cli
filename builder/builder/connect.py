@@ -24,7 +24,7 @@ def connect(requested_models):
 	#paths = connect_models(model_list)
 	connect_models(models)
 
-def locate_model_files(requested_models):
+def locate_model_files(model_names):
 	"""
 	Accepts list of model names or model filenames.
 	Returns dictionary with keys from input and values as the associated model paths.
@@ -38,38 +38,21 @@ def locate_model_files(requested_models):
 	# TODO: Validate requested model names. Show warning or error if invalid, and log invalid name. Then output warning/error and instruct user to inspect a log at a specified path for more information.
 
 	print 'Requested Models:'
-	for requested_model in requested_models:
+	for requested_model in model_names:
 		is_match = model_path_pattern.match(requested_model)
 		print '\t%s\t%s' % ('valid' if is_match is not None else 'invalid', requested_model)
 		#print '\t%s' % requested_model
 	print ''
 
 	print 'Models Paths:'
-	paths = {}
-	for model in requested_models:
-
-		# TODO: search local directory for yaml file (based on input argument)
-		# TODO: search data/models folder
-
-
-		model_path = '%s-x.x.x.yaml' % model
-		#print '- %s\t%s' % (model, model_path)
-
-
-
-		current_dir = util.get_current_dir()
-		has_model_file = util.contains_file(current_dir, model_path)
-
-		
-
-		
-
-
+	model_file_paths = {}
+	current_dir = util.get_current_dir()
+	for model_name in model_names:
 
 		# TODO: Generate list of paths to search... rather than duplicating code!
 
 		# Prepare and compile regular expressions for validating and identifying a model file.
-		model_path_regex = r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % model
+		model_path_regex = r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % model_name
 		model_path_pattern = re.compile(model_path_regex)
 
 		# Initialize model search process status flags
@@ -78,13 +61,15 @@ def locate_model_files(requested_models):
 		repository_dir_match = False
 		github_dir_match = False
 
+		# Search local directory for YAML file (based on input argument)
 		if current_dir_match == False:
 			for file_name in util.get_file_list():
 				is_match = model_path_pattern.match(file_name) is not None
 				if is_match:
 					current_dir_match = True
-					paths[model] = '%s/%s' % (current_dir, file_name)
+					model_file_paths[model_name] = '%s/%s' % (current_dir, file_name)
 
+		# Search library's data/models folder
 		if current_dir_match == False:
 			#data_dir = util.get_data_filename('models/devices')
 			data_dir = util.get_data_filename('')
@@ -93,21 +78,21 @@ def locate_model_files(requested_models):
 				is_match = model_path_pattern.match(file_name) is not None
 				if is_match:
 					library_dir_match = True
-					paths[model] = '%s%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
+					model_file_paths[model_name] = '%s%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
 
 		if current_dir_match == False and library_dir_match == False:
 			# TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
 			None
 
 		if current_dir_match == False and library_dir_match == False and github_dir_match == False:
-			print 'No model file is available for \'%\'.' % model
+			print 'No model file is available for \'%\'.' % model_name
 			# TODO: Log error/warning/info
 	
-	for model in requested_models:
-		print '\t%s => Found model file: %s' % (model, paths[model])
+	for model_name in model_names:
+		print '\t%s => Found model file: %s' % (model_name, model_file_paths[model_name])
 	print ''
 	
-	return paths
+	return model_file_paths
 
 def load_models(paths):
 	"""

@@ -5,7 +5,7 @@
 #	version: <version>
 
 id: <uuid>
-name: servo
+name: Micro Servo
 ports:
     - id: <uuid>
       #label: ground
