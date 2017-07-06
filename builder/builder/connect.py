@@ -187,8 +187,11 @@ def determine_port_dependency(port):
 	
 	print '\t%s' % port_dependencies
 
+	return port_dependencies
+
 # route(models)
 # Pseudocode:
+# Start with devices that have _only_ a single configuration per port.
 # - seek power sources
 #   - for a found power source, check if the source also satisfies the other dependencies
 #     - if so, find connections on the device
@@ -204,20 +207,78 @@ def connect_models(models):
 	port_dependencies = {}
 	#print models
 	for model in models:
+		port_dependencies[model] = { 'ports': {} }
 		print 'Port Dependencies for %s:' % model.name
 		for port in model.get_ports():
-			#for state in port.states:
 			port_dependency = determine_port_dependency(port)
+			port_dependencies[model]['ports'][port] = port_dependency
+		print ''
 
+	for model in models:
+		print 'Compatible Ports for %s:' % model.name
+		for port in model.get_ports():
 			# TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
-			locate_port(port_dependency, models)
+			port_dependency = port_dependencies[model]['ports'][port]
+			port = locate_port(model, port_dependency, models)
 		print ''
 	
 	print 'TODO: Generate path YAML file.'
 
 # Locates a port on the specified model that matches the specfied port_dependency.
-def locate_port(port_dependency, models):
-	print 'Locating matching port for %s on models.' % (port_dependency)
+# TODO: Parallelize this function... so many nested loops!
+def locate_port(source_model, port_dependencies, models):
+	print '\tLocating matching port for %s on models.' % port_dependencies
+
+	port = None
+	for model in models:
+
+		if model == source_model:
+			continue
+
+		# print 'Port Dependencies for %s:' % model.name
+		port_number = 0
+		for port in model.get_ports():
+			for state in port.states:
+				#print state['direction'], state['mode'], state['voltage']
+
+				mode_match = False
+				direction_match = False
+				voltage_match = False
+
+				# TODO: Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+
+				for port_dependency in port_dependencies:
+
+					# TODO: Generate list of all possible combinations to search/test based on port state configurations.
+
+					# Test mode compatibility
+					for mode in state['mode']:
+						if mode in port_dependency['mode']:
+							# print '\t\tFound matching mode on model %s port %s!' % (model.name, port_number)
+							mode_match = True
+							break
+
+					# Test direction compatibility
+					for direction in state['direction']:
+						if direction in port_dependency['direction']:
+							# print '\t\tFound matching direction on model %s port %s!' % (model.name, port_number)
+							direction_match = True
+							break
+
+					# Test voltage compatibility
+					for voltage in state['voltage']:
+						if voltage in port_dependency['voltage']:
+							# print '\t\tFound matching direction on model %s port %s!' % (model.name, port_number)
+							voltage_match = True
+							break
+
+					# Check for matching combination pair and if it exists, add it to the list.
+					if mode_match == True and direction_match == True and voltage_match == True:
+						print '\t\tFound matching port on model %s port %s!' % (model.name, port_number)
+
+			port_number = port_number + 1
+	
+	return port
 
 if __name__ == "__main__":
 	list()
