@@ -104,7 +104,7 @@ def builder(command=None):
 	
 
 	elif args.command == 'connect':
-		connect(models=args.models)
+		connect(args.models)
 	
 
 	elif args.command == 'project': # app

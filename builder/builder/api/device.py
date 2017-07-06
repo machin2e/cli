@@ -15,7 +15,6 @@ class Device(object):
         self.name = None
         self.ports = []
 
-        print model_path
         if model_path != None:
             model = util.load_yaml_file(model_path)
             

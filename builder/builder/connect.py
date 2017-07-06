@@ -4,7 +4,7 @@ import re
 import api
 import util
 
-def connect(models):
+def connect(requested_models):
 	# Creates a YAML file describing the ports
 	# Arguments:
 	# --output <filename> (optional) specifies output file for port config
@@ -14,21 +14,42 @@ def connect(models):
 	# builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
 	# builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
 	#
-	# Note:	The arguments refer to model file names. First search local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
+	# Note:	The arguments are essentially shorthand for filenames that match a specific format for models.
+	#       First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
 
-	model_path_regex = r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$'
+	model_paths = locate_model_files(requested_models)
+
+	models = load_models(model_paths.values())
+
+	#paths = connect_models(model_list)
+	connect_models(models)
+
+def locate_model_files(requested_models):
+	"""
+	Accepts list of model names or model filenames.
+	Returns dictionary with keys from input and values as the associated model paths.
+	"""
+
+	# Prepare and compile regular expressions to validate model identifier tokens.
+	# model_path_regex = r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$'
+	model_path_regex = r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}(\.(yaml)){0,1}$'
 	model_path_pattern = re.compile(model_path_regex)
 
-	print 'Models:'
-	model_paths = {}
-	for model in models:
+	# TODO: Validate requested model names. Show warning or error if invalid, and log invalid name. Then output warning/error and instruct user to inspect a log at a specified path for more information.
+
+	print 'Requested Models:'
+	for requested_model in requested_models:
+		is_match = model_path_pattern.match(requested_model)
+		print '\t%s\t%s' % ('valid' if is_match is not None else 'invalid', requested_model)
+		#print '\t%s' % requested_model
+	print ''
+
+	print 'Models Paths:'
+	paths = {}
+	for model in requested_models:
 
 		# TODO: search local directory for yaml file (based on input argument)
 		# TODO: search data/models folder
-
-
-		file_names = util.get_file_list()
-		#print file_names
 
 
 		model_path = '%s-x.x.x.yaml' % model
@@ -39,54 +60,72 @@ def connect(models):
 		current_dir = util.get_current_dir()
 		has_model_file = util.contains_file(current_dir, model_path)
 
+		
+
+		
 
 
+
+		# TODO: Generate list of paths to search... rather than duplicating code!
+
+		# Prepare and compile regular expressions for validating and identifying a model file.
+		model_path_regex = r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % model
+		model_path_pattern = re.compile(model_path_regex)
+
+		# Initialize model search process status flags
 		current_dir_match = False
-		registry_dir_match = False
+		library_dir_match = False
+		repository_dir_match = False
+		github_dir_match = False
 
 		if current_dir_match == False:
 			for file_name in util.get_file_list():
-				#is_match = model_path_pattern.match(model_path)
-				is_match = file_name.startswith(model)
+				is_match = model_path_pattern.match(file_name) is not None
 				if is_match:
-					print '\tFound in currect directory: %s' % file_name
 					current_dir_match = True
-					model_paths[model] = '%s/%s' % (current_dir, file_name)
+					paths[model] = '%s/%s' % (current_dir, file_name)
 
 		if current_dir_match == False:
 			#data_dir = util.get_data_filename('models/devices')
 			data_dir = util.get_data_filename('')
 			#print 'DATA_DIR:', data_dir
 			for file_name in util.get_file_list(data_dir):
-				#print "FILE: %s" % file_name
-				#is_match = model_path_pattern.match(model_path)
-				is_match = file_name.startswith(model)
+				is_match = model_path_pattern.match(file_name) is not None
 				if is_match:
-					print '\tFound in registry: %s' % file_name
-					registry_dir_match = True
-					model_paths[model] = '%s%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
-					
-	print 'model_paths dict:'
-	model_list = []
-	for model in models:
-		model_path = model_paths[model]
-		device = open_model(model_path)
-		model_list.append(device)
+					library_dir_match = True
+					paths[model] = '%s%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
 
-	connect_models(model_list)
-	return
+		if current_dir_match == False and library_dir_match == False:
+			# TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
+			None
 
-def open_model(path):
+		if current_dir_match == False and library_dir_match == False and github_dir_match == False:
+			print 'No model file is available for \'%\'.' % model
+			# TODO: Log error/warning/info
+	
+	for model in requested_models:
+		print '\t%s => Found model file: %s' % (model, paths[model])
+	print ''
+	
+	return paths
+
+def load_models(paths):
+	"""
+	Reads the model files located at the specified paths and returns a list of 
+	model objects.
+	"""
+	models = []
+	for path in paths:
+		model = load_model(path)
+		models.append(model)
+	return models
+
+def load_model(path):
+	"""
+	Reads and parses the model file at the specified path, instantiates a device 
+	object, and returns the instantiated model.
+	"""
 	device = api.Device(model_path=path)
-	#for port in device.get_ports():
-		#for state in port.states:
-			#print state.mode
-			#print state.direction
-			#print state.voltage
-			#print state['mode']
-			#print state['direction']
-			#print state['voltage']
-	#print port.states
 	return device
 
 def determine_state_compatability(state):
@@ -178,15 +217,16 @@ def connect_models(models):
 	(The returned connections are written to a file.)
 	"""
 	port_dependencies = {}
-	print models
+	#print models
 	for model in models:
-		print 'DEPENDENCIES FOR %s:' % model.name
+		print 'Port Dependencies for %s:' % model.name
 		for port in model.get_ports():
 			#for state in port.states:
 			port_dependencies = determine_port_dependency(port)
 
 			# TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
 			locate_port
+		print ''
 	
 	print 'TODO: Generate path YAML file.'
 
