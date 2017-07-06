@@ -207,17 +207,17 @@ def connect_models(models):
 		print 'Port Dependencies for %s:' % model.name
 		for port in model.get_ports():
 			#for state in port.states:
-			port_dependencies = determine_port_dependency(port)
+			port_dependency = determine_port_dependency(port)
 
 			# TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
-			locate_port
+			locate_port(port_dependency, models)
 		print ''
 	
 	print 'TODO: Generate path YAML file.'
 
 # Locates a port on the specified model that matches the specfied port_dependency.
-def locate_port(model, port_dependency):
-	None
+def locate_port(port_dependency, models):
+	print 'Locating matching port for %s on models.' % (port_dependency)
 
 if __name__ == "__main__":
 	list()
