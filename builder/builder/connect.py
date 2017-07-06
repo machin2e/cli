@@ -1,28 +1,30 @@
 import os
 import re
+import logging
 
 import api
 import util
 
-def connect(requested_models):
-	# Creates a YAML file describing the ports
-	# Arguments:
-	# --output <filename> (optional) specifies output file for port config
-	#
-	# Examples:
-	# builder connect raspberry-pi-3 ir-rangefinder generic-servo
-	# builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
-	# builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
-	#
-	# Note:	The arguments are essentially shorthand for filenames that match a specific format for models.
-	#       First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
+def connect(model_names):
+	"""
+	Creates a YAML file describing the ports
+	Arguments:
+	--output <filename> (optional) specifies output file for port config
+	
+	Examples:
+	builder connect raspberry-pi-3 ir-rangefinder generic-servo
+	builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
+	builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
+	
+	Note:	The arguments are essentially shorthand for filenames that match a specific format for models.
+		  First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
+	"""
 
-	model_paths = locate_model_files(requested_models)
+	model_paths = locate_model_files(model_names)
 
 	models = load_models(model_paths.values())
 
-	#paths = connect_models(model_list)
-	connect_models(models)
+	paths = connect_models(models)
 
 def locate_model_files(model_names):
 	"""
@@ -189,13 +191,8 @@ def determine_port_dependency(port):
 
 	return port_dependencies
 
-# route(models)
-# Pseudocode:
-# Start with devices that have _only_ a single configuration per port.
-# - seek power sources
-#   - for a found power source, check if the source also satisfies the other dependencies
-#     - if so, find connections on the device
-#     - if not, continue to next power source candidate...
+# TODO: test_device_compatibility(device, device)
+# TODO?: connect_devices(model, model)
 def connect_models(models):
 	"""
 	Determines whether the models can be connected or not.
@@ -204,8 +201,24 @@ def connect_models(models):
 	(The returned connections are used to describe step by step connections + chart.)
 	(The returned connections are written to a file.)
 	"""
+
+	# route(models)
+	# Pseudocode:
+	# Start with devices that have _only_ a single configuration per port.
+	# - seek power sources
+	# - for a found power source, check if the source also satisfies the other dependencies
+		# - if so, find connections on the device
+		# - if not, continue to next power source candidate...
+
+
+	# TODO: Infer hosts or ask user interactively
+	hosts = ['Raspberry Pi 3']
+
+
+
+	paths = []
+
 	port_dependencies = {}
-	#print models
 	for model in models:
 		port_dependencies[model] = { 'ports': {} }
 		print 'Port Dependencies for %s:' % model.name
@@ -215,70 +228,89 @@ def connect_models(models):
 		print ''
 
 	for model in models:
-		print 'Compatible Ports for %s:' % model.name
+
+		if model.name in hosts:
+			print 'Skipping compatibility search for host %s.' % model.name
+			print ''
+			continue
+
+		print 'Searching for compatible ports for %s:' % model.name
 		for port in model.get_ports():
 			# TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
 			port_dependency = port_dependencies[model]['ports'][port]
-			port = locate_port(model, port_dependency, models)
+			compatible_ports = locate_compatible_port(model, port, port_dependency, models)
+			
+			# Generate list of compatible paths
+			# TODO: Make sure all required information is stored...
+			for compatible_port in compatible_ports:
+				path = api.Path()
+				path.ports.append(port)
+				path.ports.append(compatible_port)
+
+				paths.append(path)
+
 		print ''
+	
+	# print 'AVAILABLE PATHS:'
+	# for path in paths:
+		# print path
+	
+	# TODO: Generate list of valid paths.
+
+	print 'TODO: Generate step-by-step instructions. Update connections on the fly as connections are made? Sure, but add option for automating.'
 	
 	print 'TODO: Generate path YAML file.'
 
-# Locates a port on the specified model that matches the specfied port_dependency.
-# TODO: Parallelize this function... so many nested loops!
-def locate_port(source_model, port_dependencies, models):
-	print '\tLocating matching port for %s on models.' % port_dependencies
+# TODO: locate_compatible_interface(...)
+def locate_compatible_port(source_device, source_port, source_port_dependencies, devices):
+	"""
+	Locates a port on the specified model that matches the specfied port_dependency.
+	todo: parallelize this function... so many nested loops!
+	"""
+	print '\tPort %s on %s:' % (source_port.number, source_device.name)
+	print '\t\tStates: %s' % source_port.states 
+	print '\t\tDependencies: %s' % source_port_dependencies
 
-	port = None
-	for model in models:
+	# compatible_port_list[0]['port']
+	# compatible_port_list[0]['state']
+	compatible_port_list = []
+	for device in devices:
 
-		if model == source_model:
+		# Prevent attempt to search for compatible ports on the same device
+		# TODO: Add option to enable searching on the same device
+		if device == source_device:
 			continue
 
 		# print 'Port Dependencies for %s:' % model.name
-		port_number = 0
-		for port in model.get_ports():
+		for port in device.ports:
 			for state in port.states:
-				#print state['direction'], state['mode'], state['voltage']
 
-				mode_match = False
-				direction_match = False
-				voltage_match = False
-
-				# TODO: Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
-
-				for port_dependency in port_dependencies:
-
-					# TODO: Generate list of all possible combinations to search/test based on port state configurations.
-
-					# Test mode compatibility
-					for mode in state['mode']:
-						if mode in port_dependency['mode']:
-							# print '\t\tFound matching mode on model %s port %s!' % (model.name, port_number)
-							mode_match = True
-							break
-
-					# Test direction compatibility
+				# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
+				# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+				port_configuration_list = [] # TODO: compute these...
+				for mode in state['mode']:
 					for direction in state['direction']:
-						if direction in port_dependency['direction']:
-							# print '\t\tFound matching direction on model %s port %s!' % (model.name, port_number)
-							direction_match = True
-							break
+						for voltage in state['voltage']:
+							port_configuration_list.append({ 'mode': mode, 'direction': direction, 'voltage': voltage })
 
-					# Test voltage compatibility
-					for voltage in state['voltage']:
-						if voltage in port_dependency['voltage']:
-							# print '\t\tFound matching direction on model %s port %s!' % (model.name, port_number)
-							voltage_match = True
-							break
+				# Determine compatible ports
+				for port_dependency in source_port_dependencies:
+					for port_configuration in port_configuration_list:
+						if port_configuration['mode'] in port_dependency['mode'] and port_configuration['direction'] in port_dependency['direction'] and port_configuration['voltage'] in port_dependency['voltage']:
+							compatible_port_list.append({ 'port': port, 'device': device, 'state': port_configuration })
 
-					# Check for matching combination pair and if it exists, add it to the list.
-					if mode_match == True and direction_match == True and voltage_match == True:
-						print '\t\tFound matching port on model %s port %s!' % (model.name, port_number)
+	# Print the compatible ports
+	print '\t\tCompatible Ports:'
+	for compatible_port in compatible_port_list:
+		print '\t\t\tPort %s on %s: %s, %s, %s' % (compatible_port['port'].number, compatible_port['device'].name, compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
 
-			port_number = port_number + 1
-	
-	return port
+	return compatible_port_list 
+
+def select_compatible_port(port, compatible_port_list):
+	"""
+	Selects a port from `compatible_port_list` to which `port` will be connected with a path.
+	"""
+	None
 
 if __name__ == "__main__":
 	list()

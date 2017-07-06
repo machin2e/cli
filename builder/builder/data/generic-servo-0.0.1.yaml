@@ -9,7 +9,7 @@ name: Micro Servo
 ports:
     - id: <uuid>
       #label: ground
-      #number: 1
+      number: 1
       mode: power
       direction: input
       voltage: 3.3v # TODO: Support voltage ranges
@@ -23,13 +23,13 @@ ports:
       #power: common
     - id: <uuid>
       #label: signal
-      #number: 2
+      number: 2
       mode: pulse-width-modulation # alt: pwm
       direction: input # alt: in
       voltage: 3.3v
     - id: <uuid>
       #label: power
-      #number: 3
+      number: 3
       mode: power
       direction: bidirectional # alt: bi
       voltage: 0v

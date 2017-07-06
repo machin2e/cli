@@ -24,9 +24,7 @@ class Device(object):
 
             # Load ports from device model file
             for port_model in model['ports']:
-                #print port_model['number']
-
-                port = Port()
+                port = Port(port_model['number'])
 
                 # Parse port state space:
                 # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
