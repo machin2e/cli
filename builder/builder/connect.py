@@ -131,6 +131,7 @@ def determine_port_dependency(port):
 
 # TODO: expand state combinatorics and check each of them... to allow connecting two Builders, for example...
 
+
 	for state2 in port.states:
 
 		state_list = determine_state_list(state2)
@@ -354,10 +355,10 @@ def locate_compatible_port(source_device, source_port, source_port_dependencies,
 	print '\t\tStates: %s' % source_port.states 
 	print '\t\tDependencies: %s' % source_port_dependencies
 
-	# compatible_port_list[0]['port']
-	# compatible_port_list[0]['state']
 	compatible_port_list = {}
 	# compatible_port_list[other_device] = []
+	# compatible_port_list[other_device]['port'] = []
+	# compatible_port_list[other_device]['state'] = []
 	for device in devices:
 
 		# Prevent attempt to search for compatible ports on the same device
@@ -375,11 +376,8 @@ def locate_compatible_port(source_device, source_port, source_port_dependencies,
 
 				# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
 				# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+				# TODO: expand this state sooner? or use cached computation?
 				port_configuration_list = determine_state_list(state)
-				# for mode in state['mode']:
-					# for direction in state['direction']:
-						# for voltage in state['voltage']:
-							# port_configuration_list.append({ 'mode': mode, 'direction': direction, 'voltage': voltage })
 
 				# Determine compatible ports
 				for port_dependency in source_port_dependencies:
