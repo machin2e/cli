@@ -15,7 +15,7 @@ def builder(command=None):
 	# TODO: Make these optional arguments only show up for relevant argument trees.
 	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with init)')
 	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','builder'], help='specify role of builder context (use with init)')
-	parser.add_argument('--model', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
+	parser.add_argument('--component', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
 
 	# Parse arguments
 	args = None
@@ -103,8 +103,8 @@ def builder(command=None):
 			None
 	
 
-	elif args.command == 'connect':
-		connect(args.models)
+	elif args.command == 'assemble':
+		assemble(args.models)
 	
 
 	elif args.command == 'project': # app
