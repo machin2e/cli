@@ -5,16 +5,16 @@ import logging
 import api
 import util
 
-def connect(model_names):
+def assemble(model_names):
 	"""
 	Creates a YAML file describing the ports
 	Arguments:
 	--output <filename> (optional) specifies output file for port config
 	
 	Examples:
-	builder connect raspberry-pi-3 ir-rangefinder generic-servo
-	builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
-	builder connect -model raspberry-pi-3 -model ir-rangefinder -model generic-servo
+	builder assemble raspberry-pi-3 ir-rangefinder generic-servo
+	builder assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
+	builder assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
 	
 	Note:	The arguments are essentially shorthand for filenames that match a specific format for models.
 		  First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
@@ -24,7 +24,7 @@ def connect(model_names):
 
 	models = load_models(model_paths.values())
 
-	paths = connect_models(models)
+	paths = assemble_components(models)
 
 def locate_model_files(model_names):
 	"""
@@ -264,7 +264,7 @@ def determine_device_port_dependencies(model):
 
 # TODO: test_device_compatibility(device, device)
 # TODO?: connect_devices(model, model)
-def connect_models(models):
+def assemble_components(models):
 	"""
 	Determines whether the models can be connected or not.
 	If they can be connected, it searches for valid connections.
@@ -416,4 +416,4 @@ def select_compatible_port(port, compatible_port_list):
 	None
 
 if __name__ == "__main__":
-	list()
+	assemble()
