@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Uninstall package (if present)
-pip uninstall builder -y
+sudo pip uninstall builder -y
 
 # Install package
 cd builder
-pip install .
+sudo pip install .
 cd ..

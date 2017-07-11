@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-
 from imports import *
 import argparse
 import api
 import util
+
+import os # used for git
 
 def builder(command=None):
 
@@ -50,6 +51,20 @@ def builder(command=None):
 		print port.states
 	
 		return
+
+	# builder git machineee/raspberry-pi-3
+	if args.command == 'git':
+
+		username = args.option1.split('/')[0] # 'machineeeee'
+		repository = args.option1.split('/')[1] # 'raspberry-pi-3'
+
+		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.builder/devices', username, repository))
+		#git.create_packages_directory()
+		#git.clone_github_repository(username, repository, '%s/%s' % (os.getcwdu(), '.packages'))
+		git.clone_github_repository(username, repository)
+
+		return
+
 
 	if args.command == "init":
 		init(name=args.option1, role=args.role)

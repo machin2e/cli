@@ -87,8 +87,9 @@ def locate_model_files(model_names):
 			None
 
 		if current_dir_match == False and library_dir_match == False and github_dir_match == False:
-			print 'No model file is available for \'%\'.' % model_name
+			print 'No model file is available for \'%s\'.' % model_name
 			# TODO: Log error/warning/info
+                        None
 	
 	for model_name in model_names:
 		print '\t%s => Found model file: %s' % (model_name, model_file_paths[model_name])
