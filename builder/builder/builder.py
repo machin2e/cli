@@ -52,7 +52,7 @@ def builder(command=None):
 	
 		return
 
-	# builder git machineee/raspberry-pi-3
+	# `builder git machineee/raspberry-pi-3`
 	if args.command == 'git':
 
 		username = args.option1.split('/')[0] # 'machineeeee'
@@ -74,13 +74,7 @@ def builder(command=None):
 		None	
 
 	elif args.command == "start":
-
-		print '▒█▀▀█ ▒█░▒█ ▀█▀ ▒█░░░ ▒█▀▀▄ ▒█▀▀▀ ▒█▀▀█ '
-		print '▒█▀▀▄ ▒█░▒█ ▒█░ ▒█░░░ ▒█░▒█ ▒█▀▀▀ ▒█▄▄▀ '
-		print '▒█▄▄█ ░▀▄▄▀ ▄█▄ ▒█▄▄█ ▒█▄▄▀ ▒█▄▄▄ ▒█░▒█ '
-
 		# TODO: for hosts, load their own device file, and the device files for connected peripherals, their controllers, etc.; init in-memory state of board
-
 		service.manage.start()
 		service.announce.start()
 	elif args.command == "pause":

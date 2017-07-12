@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>path.py</title>
+  <link rel="stylesheet" href="../../../pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>path.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Path</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>def configure(self, mode=None, direction=None, voltage=None):
+""" Sets the state of the <code>Port</code> if it is valid.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="c1"># &quot;&quot;&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <ul>
+<li>paths:</li>
+<li>source: # This is a port
+device: raspbery-pi-3 # NOTE: This is the model file name
+number: 6
+mode: power
+direction: input
+voltage: 3.3v
+target: # This is a port
+device: servo-1
+number: 1
+mode: power
+direction: output 
+voltage: 3.3v</li>
+<li>source: # This is a port
+device: raspbery-pi-3 # NOTE: This is the model file name
+number: 7
+mode: power(ground)
+direction: bidirectional
+voltage: 0v
+target: # This is a port
+device: servo-1 # name is generated IF THERE are multiple device instances passed as args
+number: 2
+mode: power(ground)
+direction: bidirectional
+voltage: 0v</li>
+<li>source: # This is a port
+device: raspbery-pi-3 # NOTE: This is the model file name
+number: 8
+mode: pulse-width-modulation
+direction: output
+voltage: 3.3v
+target: # This is a port
+device: servo-1 # name is generated IF THERE are multiple device instances passed as args
+number: 3
+mode: pulse-width-modulation
+direction: input
+voltage: 3.3v</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

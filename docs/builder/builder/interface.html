@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>interface.py</title>
+  <link rel="stylesheet" href="../../pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>interface.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">petname</span>
+<span class="kn">import</span> <span class="nn">util</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">collections</span> <span class="c1"># for OrderedDict</span>
+<span class="kn">import</span> <span class="nn">logging</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>TODO: Move this into builder.py:</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">logger</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="s1">&#39;builder&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Check if cwd contains .builder, or if any of it's parents contain one (if so, we're in a builder repository)
+If not, create it and populate it with a 'config' file that will contain initial config
+If so, print error 'Current/parent directory already contains a .builder folder'</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Adding interface </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>TODO: Show progress bar if downloading an interface from the interface registry.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Initialize the builder root file system</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">builder_root</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_root</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>TODO: util.get_interface_root() --- replaces the above line, allowing nested interfaces</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">interface_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">builder_root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">interface_path</span><span class="p">):</span>
+		<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;mkdir </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">interface_path</span><span class="p">)</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">interface_path</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Create interface configuration</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">interface_config</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;controller.py&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[],</span>
+		<span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="s1">&#39;unassigned&#39;</span> <span class="c1"># the target device where the interface will be deployed</span>
+	<span class="p">}</span>
+	<span class="n">interface_config_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">interface_config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+	
+	<span class="n">interface_config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">interface_path</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">interface_config_path</span><span class="p">):</span>
+		<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;touch </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">interface_config_path</span><span class="p">)</span>
+		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">interface_config_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+			<span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">interface_config_json</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Create interface source/code</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">interface_source</span> <span class="o">=</span> <span class="s2">&quot;import builder</span><span class="se">\n</span><span class="s2">print builder.api.version()</span><span class="se">\n</span><span class="s2">print </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span>
+	
+	<span class="n">interface_source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">interface_path</span><span class="p">,</span> <span class="n">interface_config</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">])</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">interface_source_path</span><span class="p">):</span>
+		<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;touch </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">interface_source_path</span><span class="p">)</span>
+		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">interface_source_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+			<span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">interface_source</span><span class="p">)</span>
+	
+	<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; OK.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>parent_path = util.parent_contains('.builder')
+if not parent_path is None:
+print 'Error: I can\'t do that.'
+print 'Reason: There is already a .builder directory at %s.' % parent_path
+print 'Hint: Use <code>cd</code> to change to a different directory.' </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>TODO: Move this into builder.py:</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">logger</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="s1">&#39;builder&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Initialize the builder root file system</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">builder_root</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">get_builder_root</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>TODO: util.get_interface_root() --- replaces the above line, allowing nested interfaces</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>	<span class="n">interface_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">builder_root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">interface_path</span><span class="p">):</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Removing interface </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+		<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;rm -rfd </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">interface_path</span><span class="p">)</span>
+		<span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">interface_path</span><span class="p">)</span>
+	
+		<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; OK.&#39;</span><span class="p">)</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">print</span> <span class="s1">&#39;Error: I can</span><span class="se">\&#39;</span><span class="s1">t do that.&#39;</span>
+		<span class="k">print</span> <span class="s1">&#39;Reason: The interface </span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">name</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>print 'Hint: Check your spelling :).'</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+	<span class="n">init</span><span class="p">()</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
