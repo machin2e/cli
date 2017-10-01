@@ -8,58 +8,58 @@ import collections # for OrderedDict
 
 def init(name=None, role='workspace'):
 
-	# Check if cwd contains .builder, or if any of it's parents contain one (if so, we're in a builder repository)
+	# Check if cwd contains .gesso, or if any of it's parents contain one (if so, we're in a gesso repository)
 	#	If not, create it and populate it with a 'config' file that will contain initial config
-	#	If so, print error 'Current/parent directory already contains a .builder folder'
+	#	If so, print error 'Current/parent directory already contains a .gesso folder'
 
-	parent_path = util.parent_contains('.builder')
+	parent_path = util.parent_contains('.gesso')
 	if not parent_path is None:
 		print 'Error: I can\'t do that.'
-		print 'Reason: There is already a .builder directory at %s.' % parent_path
+		print 'Reason: There is already a .gesso directory at %s.' % parent_path
 		print 'Hint: Use `cd` to change to a different directory.' 
 
 	else:
 
-		builder_root = os.getcwdu()
+		gesso_root = os.getcwdu()
 
-		# Initialize the builder root file system
-		builder_path = os.path.join(builder_root, '.builder')
-		if not os.path.exists(builder_path):
-			print 'mkdir %s' % builder_path 
-			os.makedirs(builder_path)
+		# Initialize the gesso root file system
+		gesso_path = os.path.join(gesso_root, '.gesso')
+		if not os.path.exists(gesso_path):
+			print 'mkdir %s' % gesso_path 
+			os.makedirs(gesso_path)
 
-		# Initialize builder config file
-		#builder_config = collections.OrderedDict()
-		#builder_config['name'] = petname.Generate(2) if name == None else name
-		#builder_config['uuid'] = str(uuid.uuid4()) # TODO: Read UUID from device via Builder API
-		#builder_config['role'] = str(role)
-		#builder_config['project'] = 'none'
-		builder_config = {
+		# Initialize gesso config file
+		#gesso_config = collections.OrderedDict()
+		#gesso_config['name'] = petname.Generate(2) if name == None else name
+		#gesso_config['uuid'] = str(uuid.uuid4()) # TODO: Read UUID from device via Gesso API
+		#gesso_config['role'] = str(role)
+		#gesso_config['project'] = 'none'
+		gesso_config = {
 			'name': petname.Generate(2) if name == None else name,
 			'uuid': str(uuid.uuid4()), # TODO: read UUID from hardware!
 			'role': str(role),
 			'project': 'none'
 		}
-		builder_config_json = json.dumps(builder_config, indent=4, sort_keys=False)
+		gesso_config_json = json.dumps(gesso_config, indent=4, sort_keys=False)
 
-		builder_config_path = os.path.join(builder_root, '.builder', 'config')
-		if not os.path.exists(builder_config_path):
-			print 'touch %s' % builder_config_path 
-			with open(builder_config_path, 'w+') as file:
-				file.write(builder_config_json)
+		gesso_config_path = os.path.join(gesso_root, '.gesso', 'config')
+		if not os.path.exists(gesso_config_path):
+			print 'touch %s' % gesso_config_path 
+			with open(gesso_config_path, 'w+') as file:
+				file.write(gesso_config_json)
 
 		# create interface configuration
-		system_controller_source = 'import builder\nimport builder.api\nprint builder.api.version()'
+		system_controller_source = 'import gesso\nimport gesso.api\nprint gesso.api.version()'
 		
-		system_controller_path = os.path.join(builder_root, 'system.py')
+		system_controller_path = os.path.join(gesso_root, 'system.py')
 		if not os.path.exists(system_controller_path):
 			logger.info('touch %s' % system_controller_path)
 			with open(system_controller_path, 'w+') as file:
 				file.write(system_controller_source)
 
-		# builder init zesty-koala --virtual
-		if role == 'builder':
-			# This is done only builder devices. Not dev machines!
+		# gesso init zesty-koala --virtual
+		if role == 'gesso':
+			# This is done only gesso devices. Not dev machines!
 			# Add insecure pre-shared SSH public key (to boostrap communications)
 			insecure_ssh_public_key = util.get_file('public_key')
 			os.system('echo "%s" | cat >> ~/.ssh/authorized_keys' % insecure_ssh_public_key)

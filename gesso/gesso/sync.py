@@ -22,7 +22,7 @@ def sync(name, username='vagrant'):
 		process = subprocess.Popen(['unison',
 									'-sshargs', "'-o StrictHostKeyChecking=no'",
 									'-auto', '-batch',
-									device_name, 'ssh://vagrant@%s//builder' % device_ip], 
+									device_name, 'ssh://vagrant@%s//gesso' % device_ip], 
 								   stdout=subprocess.PIPE,
 								   stdin=subprocess.PIPE,
 								   stderr=subprocess.PIPE,

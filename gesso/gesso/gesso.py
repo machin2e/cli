@@ -15,7 +15,7 @@ def gesso(command=None):
 	parser.add_argument('option2', nargs='?', default=None)
 	# TODO: Make these optional arguments only show up for relevant argument trees.
 	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with init)')
-	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','builder'], help='specify role of builder context (use with init)')
+	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','gesso'], help='specify role of gesso context (use with init)')
 	parser.add_argument('--component', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
 
 	# Parse arguments
@@ -26,23 +26,23 @@ def gesso(command=None):
 	else:
 		args = parser.parse_args()
 
-	# TODO: Search for all available "builder_*" files in toolchain and print error with command to repair the toolchain.
+	# TODO: Search for all available "gesso_*" files in toolchain and print error with command to repair the toolchain.
 	
 
 	if not args.command == 'init':
-		if not util.is_builder_tree():
+		if not util.is_gesso_tree():
 			print 'Error: I can\'t do that.'
-			print 'Reason: There is no .builder directory in the current or parent directories.'
-			print 'Hint: Run `builder init`.' 
+			print 'Reason: There is no .gesso directory in the current or parent directories.'
+			print 'Hint: Run `gesso init`.' 
 			return
 
-	# TODO: make sure `builder init` was called prior to other commands!
+	# TODO: make sure `gesso init` was called prior to other commands!
 
-	# TODO: during `builder init`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
+	# TODO: during `gesso init`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
 	# TODO: don't worry about filesystem too much for now... just load model (proxy for download), then update state through API... DO THIS IN CONTROLLER? NOT CLI? PROBALBY!!!!!!!
 	if args.command == 'port':
-		#path = os.path.join(util.get_builder_root(), '_robot', 'motors', 'right-servo', 'model-device-builder.yaml')
-		path = os.path.join(util.get_builder_root(), '.builder', 'devices', 'builder-8.0.0.yaml')
+		#path = os.path.join(util.get_gesso_root(), '_robot', 'motors', 'right-servo', 'model-device-gesso.yaml')
+		path = os.path.join(util.get_gesso_root(), '.gesso', 'devices', 'gesso-8.0.0.yaml')
 		device = api.Device(model_path=path)
 		for port in device.get_ports():
 			print port.mode
@@ -52,13 +52,13 @@ def gesso(command=None):
 	
 		return
 
-	# `builder git machineee/raspberry-pi-3`
+	# `gesso git machineee/raspberry-pi-3`
 	if args.command == 'git':
 
 		username = args.option1.split('/')[0] # 'machineeeee'
 		repository = args.option1.split('/')[1] # 'raspberry-pi-3'
 
-		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.builder/devices', username, repository))
+		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/devices', username, repository))
 		#git.create_packages_directory()
 		#git.clone_github_repository(username, repository, '%s/%s' % (os.getcwdu(), '.packages'))
 		git.clone_github_repository(username, repository)
@@ -170,20 +170,20 @@ def gesso(command=None):
 	elif args.command == 'material': # Alt: 'design', 'asset' (CAD design file)
 		None
 
-	# builder port add digital,output,ttl --interface servo
-	# builder port add digital,output,ttl --interface servo
-	# builder port add digital,output,ttl --interface servo
+	# gesso port add digital,output,ttl --interface servo
+	# gesso port add digital,output,ttl --interface servo
+	# gesso port add digital,output,ttl --interface servo
 
-	# builder interface deploy|assign <device-name>
+	# gesso interface deploy|assign <device-name>
 
-	# builder interface assemble|install
+	# gesso interface assemble|install
 
-	# builder assemble|install
+	# gesso assemble|install
 
-	# builder deploy
+	# gesso deploy
 
 	elif args.command == 'log':
-		# TODO: builder [device <name>] log <announce|manage|command>
+		# TODO: gesso [device <name>] log <announce|manage|command>
 		None
 
 	elif args.command == 'sync':
@@ -206,10 +206,10 @@ def gesso(command=None):
 	else:
 		print 'Error: I can\'t do that.'
 		print 'Reason: Unrecognized expression.'
-		print 'Hint: Run `builder help` to see what I can do.'
+		print 'Hint: Run `gesso help` to see what I can do.'
 
 # TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
-# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./builder interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
+# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./gesso interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
 # "IT'S ACTUALLY FUN TO PROGRAM BY JUMPING AROUND SEEING THE HIGHLIGHTED DEVICE SO YOU KNOW WHERE YOU'RE WORKING, AND SEEING HUD ON PHONE AND IN WINDOWS ON DESKTOP (SUMMONABLE/ASSIGNABLE VIA COMMAND LINE. SHOW UP AS SNAPPABLE WINDOWS. CAN SAVE AND CHANGE VIEWS WITH A COMMAND AS WELL. CAN MAKE ALWAYS ON TOP, TOO.).
 
 if __name__ == "__main__":

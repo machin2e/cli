@@ -9,21 +9,21 @@ import logging
 
 def add(name=None):
 
-	# TODO: Move this into builder.py:
-	logger = util.logger('builder')
+	# TODO: Move this into gesso.py:
+	logger = util.logger('gesso')
 
-	# Check if cwd contains .builder, or if any of it's parents contain one (if so, we're in a builder repository)
+	# Check if cwd contains .gesso, or if any of it's parents contain one (if so, we're in a gesso repository)
 	#	If not, create it and populate it with a 'config' file that will contain initial config
-	#	If so, print error 'Current/parent directory already contains a .builder folder'
+	#	If so, print error 'Current/parent directory already contains a .gesso folder'
 	sys.stdout.write('Adding interface %s.' % name)
 	sys.stdout.flush()
 
 	# TODO: Show progress bar if downloading an interface from the interface registry.
 
-	# Initialize the builder root file system
-	builder_root = util.get_builder_root()
+	# Initialize the gesso root file system
+	gesso_root = util.get_gesso_root()
 	# TODO: util.get_interface_root() --- replaces the above line, allowing nested interfaces
-	interface_path = os.path.join(builder_root, name)
+	interface_path = os.path.join(gesso_root, name)
 	if not os.path.exists(interface_path):
 		logger.info('mkdir %s' % interface_path)
 		os.makedirs(interface_path)
@@ -43,7 +43,7 @@ def add(name=None):
 			file.write(interface_config_json)
 
 	# Create interface source/code
-	interface_source = "import builder\nprint builder.api.version()\nprint \'%s\'" % name
+	interface_source = "import gesso\nprint gesso.api.version()\nprint \'%s\'" % name
 	
 	interface_source_path = os.path.join(interface_path, interface_config['source'])
 	if not os.path.exists(interface_source_path):
@@ -54,21 +54,21 @@ def add(name=None):
 	sys.stdout.write(' OK.\n')
 	sys.stdout.flush()
 
-	#parent_path = util.parent_contains('.builder')
+	#parent_path = util.parent_contains('.gesso')
 	#if not parent_path is None:
 		#print 'Error: I can\'t do that.'
-		#print 'Reason: There is already a .builder directory at %s.' % parent_path
+		#print 'Reason: There is already a .gesso directory at %s.' % parent_path
 		#print 'Hint: Use `cd` to change to a different directory.' 
 
 def remove(name=None):
 
-	# TODO: Move this into builder.py:
-	logger = util.logger('builder')
+	# TODO: Move this into gesso.py:
+	logger = util.logger('gesso')
 
-	# Initialize the builder root file system
-	builder_root = util.get_builder_root()
+	# Initialize the gesso root file system
+	gesso_root = util.get_gesso_root()
 	# TODO: util.get_interface_root() --- replaces the above line, allowing nested interfaces
-	interface_path = os.path.join(builder_root, name)
+	interface_path = os.path.join(gesso_root, name)
 	if os.path.exists(interface_path):
 		sys.stdout.write('Removing interface %s.' % name)
 		sys.stdout.flush()

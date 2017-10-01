@@ -12,9 +12,9 @@ def assemble(model_names):
 	--output <filename> (optional) specifies output file for port config
 	
 	Examples:
-	builder assemble raspberry-pi-3 ir-rangefinder generic-servo
-	builder assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
-	builder assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
+	gesso assemble raspberry-pi-3 ir-rangefinder generic-servo
+	gesso assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
+	gesso assemble --component raspberry-pi-3 --component ir-rangefinder --component generic-servo
 	
 	Note:	The arguments are essentially shorthand for filenames that match a specific format for models.
 		  First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).

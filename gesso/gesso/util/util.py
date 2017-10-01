@@ -42,7 +42,7 @@ def get_inet_addresses():
 
 def load_yaml_file(path):
     # TODO: load .yaml file with model for particular (id, version) and populate this model... create __init__ to do that... multiple constructors!
-    #device_model_path = 'model-device-builder.yaml'
+    #device_model_path = 'model-device-gesso.yaml'
     yaml_object = None
 
     with open(path, 'r') as file:
@@ -89,69 +89,69 @@ def parent_contains(filename, path=os.getcwdu(), recursive=True):
 	else:
 		return None
 
-def get_builder_root(path=os.getcwdu()):
-	return parent_contains('.builder')
+def get_gesso_root(path=os.getcwdu()):
+	return parent_contains('.gesso')
 
-def is_builder_root(path=os.getcwdu()):
-	return path == get_builder_root(path)
+def is_gesso_root(path=os.getcwdu()):
+	return path == get_gesso_root(path)
 
-def is_builder_tree(path=os.getcwdu()):
-	if parent_contains('.builder'):
+def is_gesso_tree(path=os.getcwdu()):
+	if parent_contains('.gesso'):
 		return True
 	else:
 		return False
 
-def init_workspace_path(path=get_builder_root()):
+def init_workspace_path(path=get_gesso_root()):
 
-	# make "./.builder/vagrant" folder if doesn't exist
-	# make "./.builder/vagrant/<vm-name>" folder for generated name
-	# generate ./.builder/vagrant/<vm-name>" Vagrantfile
+	# make "./.gesso/vagrant" folder if doesn't exist
+	# make "./.gesso/vagrant/<vm-name>" folder for generated name
+	# generate ./.gesso/vagrant/<vm-name>" Vagrantfile
 	#    - modify to set the name of the VM
 	#    - add bootstrap.sh
-	#         - run "builder init <vm-name>" on VM
+	#         - run "gesso init <vm-name>" on VM
 
-	builder_path = os.path.join(path, '.builder')
-	if not os.path.exists(builder_path):
-		print 'mkdir %s' % builder_path
-		os.makedirs(builder_path)
+	gesso_path = os.path.join(path, '.gesso')
+	if not os.path.exists(gesso_path):
+		print 'mkdir %s' % gesso_path 
+		os.makedirs(gesso_path)
 	
-	devices_path = os.path.join(path, '.builder', 'devices')
+	devices_path = os.path.join(path, '.gesso', 'devices')
 	if not os.path.exists(devices_path):
 		print 'mkdir %s' % devices_path 
 		os.makedirs(devices_path)
 
-def init_machine_path(name, path=get_builder_root()):
+def init_machine_path(name, path=get_gesso_root()):
 
 	init_workspace_path(path)
 
 	# Example filesystem:
 	#
-	# .builder
+	# .gesso
 	#     /devices
 	#         /fuzzy-koala
 	#             /vagrant    
 	#                 .Vagrantfile
 
-	machine_path = os.path.join(path, '.builder', 'devices', name)
+	machine_path = os.path.join(path, '.gesso', 'devices', name)
 	if not os.path.exists(machine_path):
 		print 'mkdir %s' % machine_path
 		os.makedirs(machine_path)
 
 	#if virtual:
-	#vagrant_path = os.path.join(path, '.builder', 'devices', name, 'vagrant')
+	#vagrant_path = os.path.join(path, '.gesso', 'devices', name, 'vagrant')
 	#if not os.path.exists(vagrant_path):
 	#	print 'mkdir %s' % vagrant_path
 	#	os.makedirs(vagrant_path)
 	
 	return machine_path
 
-def get_machine_path(name, path=get_builder_root()):
-	return os.path.join(path, '.builder', 'devices', name)
+def get_machine_path(name, path=get_gesso_root()):
+	return os.path.join(path, '.gesso', 'devices', name)
 
 # TODO: Add to Device/Database class (serves as data access interface/map to device)
 def get_machine_address(name):
-	builder_db_path = get_database_path()
-	db = TinyDB(builder_db_path, default_table='gesso')
+	gesso_db_path = get_database_path()
+	db = TinyDB(gesso_db_path, default_table='gesso')
 	device_table = db.table('device')
 
 	device = None
@@ -165,8 +165,8 @@ def get_machine_address(name):
 
 # Get machines from database
 def get_machines():
-	builder_db_path = get_database_path()
-	db = TinyDB(builder_db_path, default_table='gesso')
+	gesso_db_path = get_database_path()
+	db = TinyDB(gesso_db_path, default_table='gesso')
 	device_table = db.table('device')
 
 	#device = None
@@ -181,20 +181,20 @@ def get_machines():
 
 def logger(log_name):
 	"""
-	Returns a logger for the log located at '.builder/logs/<log_name>'.
-	If the log doesn't exist, creates it in the '.builder/logs' directory.
+	Returns a logger for the log located at '.gesso/logs/<log_name>'.
+	If the log doesn't exist, creates it in the '.gesso/logs' directory.
 	"""
 
 	#current_dir = os.getcwdu()
-	builder_root = get_builder_root()
-	#TODO: if builder_root != None:
+	gesso_root = get_gesso_root()
+	#TODO: if gesso_root != None:
 
-	builder_folder = os.path.join(builder_root, '.builder')
-	if not os.path.exists(builder_folder):
-		print 'mkdir %s' % builder_folder
-		os.makedirs(builder_folder)
+	gesso_folder = os.path.join(gesso_root, '.gesso')
+	if not os.path.exists(gesso_folder):
+		print 'mkdir %s' % gesso_folder
+		os.makedirs(gesso_folder)
 
-	log_folder = os.path.join(builder_root, '.builder', 'logs')
+	log_folder = os.path.join(gesso_root, '.gesso', 'logs')
 	if not os.path.exists(log_folder):
 		print 'mkdir %s' % log_folder 
 		os.makedirs(log_folder)
@@ -224,7 +224,7 @@ def get_data_dir():
 def get_data_filename(filename):
 	return pkg_resources.resource_filename('gesso', 'data/%s' % filename)
 
-def setup_builder_dir():
+def setup_gesso_dir():
 	return None	
 
 def get_current_dir():
@@ -233,8 +233,8 @@ def get_current_dir():
 def get_parent_dir():
 	return os.path.abspath(os.path.join(get_current_dir(), os.pardir)) 
 
-def get_builder_dir():
-	return os.path.join(get_current_dir(), '.builder')
+def get_gesso_dir():
+	return os.path.join(get_current_dir(), '.gesso')
 
 # Load copy of file 
 def get_file(name):
@@ -247,27 +247,27 @@ def get_vagrant_file(name):
 	return vagrantfiledata
 
 # Load the Builderfile into a dictionary
-def load_builderfile(path=get_builder_root()):
-	builder_config_path = os.path.join(path, '.builder', 'config')
+def load_gessofile(path=get_gesso_root()):
+	gesso_config_path = os.path.join(path, '.gesso', 'config')
 
 	# Load the record from database
-	builder_config = {}
-	with open(builder_config_path, 'r') as file:
-		builder_config = json.loads(file.read())
-		#builderfile_json = json.dumps(builderfile, indent=4, sort_keys=False)
+	gesso_config = {}
+	with open(gesso_config_path, 'r') as file:
+		gesso_config = json.loads(file.read())
+		#gessofile_json = json.dumps(gessofile, indent=4, sort_keys=False)
 
-	return builder_config
+	return gesso_config
 
 # TODO: class Database:
 
 # Get the path to SQLite database
-def get_database_path(path=get_builder_root()):
-	builder_db_path = os.path.join(path, '.builder', 'database')
-	return builder_db_path
+def get_database_path(path=get_gesso_root()):
+	gesso_db_path = os.path.join(path, '.gesso', 'database')
+	return gesso_db_path
 
 # Write updated database
-def store_builderfile(builderfile, path=os.getcwdu()):
-	builderfile_json = json.dumps(builderfile, indent=4, sort_keys=False)
+def store_gessofile(gessofile, path=os.getcwdu()):
+	gessofile_json = json.dumps(gessofile, indent=4, sort_keys=False)
 	with open(path, 'w') as file:
-		file.write(builderfile_json)
+		file.write(gessofile_json)
 	#logger.info('---\n%s\n---' % db_dict_json)

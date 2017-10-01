@@ -17,7 +17,7 @@ def start():
 	sys.stdout.write('Starting manager service.')
 
 	current_dir = os.getcwdu()
-	p = subprocess.Popen(['builder', 'manage', 'run'], cwd=current_dir)
+	p = subprocess.Popen(['gesso', 'manage', 'run'], cwd=current_dir)
 	sys.stdout.write(' OK.\n')
 
 	# Log status
@@ -87,8 +87,8 @@ class S(BaseHTTPRequestHandler):
 		self.end_headers()
 
 		# Generate response
-		builderfile = util.load_builderfile()
-		status_json = json.dumps(builderfile, indent=4, sort_keys=False)
+		gessofile = util.load_gessofile()
+		status_json = json.dumps(gessofile, indent=4, sort_keys=False)
 
 		# Write response
 		self.wfile.write(status_json)
@@ -118,13 +118,13 @@ class S(BaseHTTPRequestHandler):
 		self.end_headers()
 
 		# Generate data structure
-		#builder_dir = os.path.abspath('/builder')
-		builder_dir = os.getcwdu()
-		builderfile_path = os.path.abspath(os.path.join(builder_dir, 'db_state.json'))
+		#gesso_dir = os.path.abspath('/gesso')
+		gesso_dir = os.getcwdu()
+		gessofile_path = os.path.abspath(os.path.join(gesso_dir, 'db_state.json'))
 
 		# Load the record from database
 		db_dict = {}
-		file = open(builderfile_path, 'r')
+		file = open(gessofile_path, 'r')
 		db_dict = json.loads(file.read())
 		file.close()
 		db_dict_json = json.dumps(db_dict, indent=4, sort_keys=False)
@@ -179,14 +179,14 @@ class S(BaseHTTPRequestHandler):
 		logger.info('%s' % json.dumps(request_dict, indent=4, sort_keys=False))
 
 		# Process request
-		#builder_dir = os.path.abspath('/builder')
-		builder_dir = os.getcwd()
-		builderfile_path = os.path.abspath(os.path.join(builder_dir, 'db_state.json'))
-		logger.info(builderfile_path)
+		#gesso_dir = os.path.abspath('/gesso')
+		gesso_dir = os.getcwd()
+		gessofile_path = os.path.abspath(os.path.join(gesso_dir, 'db_state.json'))
+		logger.info(gessofile_path)
 
 		# Load the record from database
 		db_dict = {}
-		file = open(builderfile_path, 'r')
+		file = open(gessofile_path, 'r')
 		db_dict = json.loads(file.read())
 		file.close()
 		#logger.info('%s' % json.dumps(db_dict, indent=4, sort_keys=False))
@@ -198,13 +198,13 @@ class S(BaseHTTPRequestHandler):
 		#logger.info('---\n%s\n---' % db_dict_json)
 
 		# Write updated database
-		file = open(builderfile_path, 'w')
+		file = open(gessofile_path, 'w')
 		file.write(db_dict_json)
 		file.close()
 
 		# Generate response (with JSON)
 		response = {}
-		#file = open(builderfile_path, 'r')
+		#file = open(gessofile_path, 'r')
 		#response['body'] = file.read()
 		#file.close()
 		#response['body'] = db_dict_json
@@ -226,8 +226,8 @@ def run(server_class=HTTPServer, handler_class=S, port=80):
 	# Write pid into pidfile
 	current_dir = os.getcwd()
 	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__) # create the pidfile
-	# TODO: get name of file for naming "builder.<filename>.pid"
-	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
+	# TODO: get name of file for naming "gesso.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='gesso.broadcast.', suffix='.pid').name
 	pidfile = open(pidfile_path, "w+")
 	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
 	pidfile.write('%s' % os.getpid())
@@ -240,46 +240,46 @@ def run(server_class=HTTPServer, handler_class=S, port=80):
 	print ' OK.'
 	httpd.serve_forever()
 
-# is_builder_dir(path)
-# get_builder_dir()
+# is_gesso_dir(path)
+# get_gesso_dir()
 # get_current_dir()
-# get_builder_dir_type(path) # returns 'controller' or 'programmer'/'orchestrator'
+# get_gesso_dir_type(path) # returns 'controller' or 'programmer'/'orchestrator'
 
-# Returns true if the path contains a valid Builderfile.
-# TODO: Check validity of Builderfile.
-def is_builder_path(path=os.getcwd()):
-	builderfile_path = os.path.join(path, 'Builderfile')
-	if os.path.exists(builderfile_path):
+# Returns true if the path contains a valid Gessofile.
+# TODO: Check validity of Gessofile.
+def is_gesso_path(path=os.getcwd()):
+	gessofile_path = os.path.join(path, 'Gessofile')
+	if os.path.exists(gessofile_path):
 		return True
 	else:
 		return False
 
 # TODO: Consider renaming to is_programmer_path() or is_composer_path() or is_assembler_path()
-# TODO: Make sure this doesn't return true when on a coordinator in a sync folder. Check parent directory for Builderfile of coordinator.
+# TODO: Make sure this doesn't return true when on a coordinator in a sync folder. Check parent directory for Gessofile of coordinator.
 def is_controller_path(path=os.getcwd()):
-	# Load the Builderfile
-	builderfile = util.load_builderfile(path)
+	# Load the Gessofile
+	gessofile = util.load_gessofile(path)
 	
 	# Check the 'role' field
-	if 'role' in builderfile and builderfile['role'] == 'controller':
+	if 'role' in gessofile and gessofile['role'] == 'controller':
 		return True
 
 	return False
 
 # TODO: Consider renaming to is_orchestrator_path() or is_planner_path()
 def is_coordinator_path(path=os.getcwd()):
-	# Load the Builderfile
-	builderfile = util.load_builderfile(path)
+	# Load the Gessofile
+	gessofile = util.load_gessofile(path)
 	
 	# Check the 'role' field
-	if 'role' in builderfile and builderfile['role'] == 'coordinator':
+	if 'role' in gessofile and gessofile['role'] == 'coordinator':
 		return True
 
 	return False
 
 def generate_listing():
-	builderfile = util.load_builderfile()
-	return builderfile 
+	gessofile = util.load_gessofile()
+	return gessofile 
 
 if __name__ == "__main__":
 	run()

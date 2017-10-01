@@ -16,7 +16,7 @@ def add(name, virtual=True):
 
 	machine_path = util.init_machine_path(name)
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
 	# i.e., `vagrant init`
@@ -28,7 +28,7 @@ def add(name, virtual=True):
 		#process = subprocess.Popen(['vagrant', 'init', '-m', vagrant_box], stdout=subprocess.PIPE, cwd=machine_path)
 		process = subprocess.Popen(['vagrant', 'init'], stdout=log, cwd=machine_path)
 		process.wait()
-		# TODO: save vagrant log in '.builder/logs/vagrant.log'
+		# TODO: save vagrant log in '.gesso/logs/vagrant.log'
 
 	# Generate copy of Vagrantfile from template file
 	with open(os.path.join(machine_path, 'Vagrantfile'), 'w+') as file:
@@ -66,18 +66,18 @@ def list(name=None):
 	
 	print tabulate(table_rows, headers=columns)
 
-# builder device start golden-hornet
+# gesso device start golden-hornet
 def start(name, background=True):
 	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
 	# Start virtual machine
 	machine_path = util.get_machine_path(name)
 	with open(vagrant_log_path, 'w+') as log:
 		if background == True:
-			sys.stdout.write('Starting VM in background. VM will be available in a few minutes. Check status with `builder device list`.')
+			sys.stdout.write('Starting VM in background. VM will be available in a few minutes. Check status with `gesso device list`.')
 			sys.stdout.flush()
 		elif background == False:
 			sys.stdout.write('Starting VM.')
@@ -104,7 +104,7 @@ def ssh(name=None):
 def restart(name):
 	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
 	# Start virtual machine
@@ -121,7 +121,7 @@ def restart(name):
 def pause(name):
 	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
 	# Start virtual machine
@@ -138,7 +138,7 @@ def pause(name):
 def stop(name):
 	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log')
 
 	# Start virtual machine
@@ -155,7 +155,7 @@ def remove(name):
 	# TODO: Determine if machine is a VM by checking if a Vagrantfile exists in the machine_path
 	# TODO: Check if machine is running. If so, shutdown before continuing. Verify that it's shut down.
 
-	log_path = os.path.join(util.get_builder_root(), '.builder', 'logs')
+	log_path = os.path.join(util.get_gesso_root(), '.gesso', 'logs')
 	vagrant_log_path = os.path.join(log_path, 'vagrant.log') 
 	# Destroy virtual machine
 	machine_path = util.get_machine_path(name)
@@ -179,7 +179,7 @@ def remove(name):
 
 	# Remove device from registry (in SQLite database) if it exists
 	db_path = util.get_database_path()
-	db = TinyDB(db_path, default_table='builder')
+	db = TinyDB(db_path, default_table='gesso')
 	Device = Query()
 	device = db.table('device').get(Device.name == name)
 	if device != None:

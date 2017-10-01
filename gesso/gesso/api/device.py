@@ -47,7 +47,7 @@ class Device(object):
                 self.ports.append(port)
 
                 # Registry URI example:
-                # builder.network/mokogobo/builder-8.0.0
+                # gesso.network/mokogobo/gesso-8.0.0
 
 
     # def get_state(self):

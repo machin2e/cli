@@ -40,31 +40,31 @@ def list_udp(name=None):
 			sys.stdout.write("%s\t%s" % (data, fromaddr[0]))
 			sys.stdout.flush()
 
-			# TODO: create directories in builder_dir for the discovered VM if it doesn't already exist
-			#create_builer_folder(builder_name)
-			create_builder_folder(data)
+			# TODO: create directories in gesso_dir for the discovered VM if it doesn't already exist
+			#create_builer_folder(gesso_name)
+			create_gesso_folder(data)
 		except:
 			None
 		current_time = int(round(time.time() * 1000))
 	s.close()
 
-def create_builder_folder(data):
+def create_gesso_folder(data):
 	data_dict = json.loads(data)
 
 	current_dir = os.getcwdu()
 
-	# Create builder folder if it doesn't exist
-	builder_dir = os.path.abspath(os.path.join(current_dir, data_dict['name']))
-	if not os.path.exists(builder_dir):
-		os.makedirs(builder_dir)
+	# Create gesso folder if it doesn't exist
+	gesso_dir = os.path.abspath(os.path.join(current_dir, data_dict['name']))
+	if not os.path.exists(gesso_dir):
+		os.makedirs(gesso_dir)
 
 
 def list2():
-	builderfile_path = './Builderfile'
+	gessofile_path = './Gessofile'
 
-	# Read the Builderfile
+	# Read the Gessofile
 	# TODO: Initialize the daemon here?
-	file = open(builderfile_path, 'r')
+	file = open(gessofile_path, 'r')
 	filelines = file.readlines()
 	
 	device_uuid = 'N/A'
@@ -90,8 +90,8 @@ def list2():
 
 	# List VMs (if any)
 	current_dir = os.getcwdu()
-	builder_dir = os.path.abspath(os.path.join(current_dir, '.builder'))
-	vagrant_dir = os.path.abspath(os.path.join(builder_dir, 'vagrant'))
+	gesso_dir = os.path.abspath(os.path.join(current_dir, '.gesso'))
+	vagrant_dir = os.path.abspath(os.path.join(gesso_dir, 'vagrant'))
 
 	virtual_machines = []
 	for dir in os.listdir(vagrant_dir):

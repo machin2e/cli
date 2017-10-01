@@ -16,7 +16,7 @@ def start():
 
 	sys.stdout.write('Starting broadcast service.')
 	current_file_path = os.getcwdu()
-	p = subprocess.Popen(['builder', 'announce', 'run'], cwd=current_file_path)
+	p = subprocess.Popen(['gesso', 'announce', 'run'], cwd=current_file_path)
 	sys.stdout.write(' OK.\n')
 
 	# Log status
@@ -31,8 +31,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	# Write pid into pidfile
 	current_dir = os.getcwd()
 	pidfile_path = os.path.join(tempfile.gettempdir(), '%s.pid' % __name__)
-	# TODO: get name of file for naming "builder.<filename>.pid"
-	# TODO: tempfile.NamedTemporaryFile(prefix='builder.broadcast.', suffix='.pid').name
+	# TODO: get name of file for naming "gesso.<filename>.pid"
+	# TODO: tempfile.NamedTemporaryFile(prefix='gesso.broadcast.', suffix='.pid').name
 	pidfile = open(pidfile_path, "w+")
 	#portalocker.lock(pidfile, portalocker.LOCK_EX) # lock the pidfile
 	pidfile.write('%s' % os.getpid())
@@ -52,8 +52,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 	# e.g., "\f52	16561	text	announce device 002fffff-ffff-ffff-4e45-3158200a0015"
 	# data = "\f52\t16561\ttext\tannounce device 002fffff-ffff-ffff-4e45-3158200a0015";
 	# data = "\f52\t33439\ttext\tannounce device f1aceb8b-e8e9-4cda-b29c-de7bc7cc390f"
-	builder_config = util.load_builderfile()
-	broadcast_message = 'announce\n\n%s' % json.dumps(builder_config)
+	gesso_config = util.load_gessofile()
+	broadcast_message = 'announce\n\n%s' % json.dumps(gesso_config)
 	logger.info('%s' % broadcast_message)
 	#broadcast_message = "announce device %s" % device_uuid
 
@@ -85,8 +85,8 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 						device['time_updated'] = datetime.utcnow().isoformat()
 
 						# Save device status in registry (in SQLite database)
-						builder_db_path = util.get_database_path()
-						db = TinyDB(builder_db_path, default_table='builder')
+						gesso_db_path = util.get_database_path()
+						db = TinyDB(gesso_db_path, default_table='gesso')
 						device_table = db.table('device')
 
 						Device = Query()
@@ -98,19 +98,19 @@ def run(port=4445, broadcast_address='192.168.1.255', broadcast_timeout=2000):
 							device_table.update(device, Device.name == device['name'])
 
 						# Create device folder if doesn't already exist
-						builder_root = util.get_builder_root()
+						gesso_root = util.get_gesso_root()
 
-						builder_folder = os.path.join(builder_root, '.builder')
-						if not os.path.exists(builder_folder):
-							print 'mkdir %s' % builder_folder
-							os.makedirs(builder_folder)
+						gesso_folder = os.path.join(gesso_root, '.gesso')
+						if not os.path.exists(gesso_folder):
+							print 'mkdir %s' % gesso_folder
+							os.makedirs(gesso_folder)
 
-						device_folder = os.path.join(builder_root, '.builder', 'devices')
+						device_folder = os.path.join(gesso_root, '.gesso', 'devices')
 						if not os.path.exists(device_folder):
 							print 'mkdir %s' % device_folder 
 							os.makedirs(device_folder)
 
-						machine_folder = os.path.join(builder_root, '.builder', 'devices', device['name'])
+						machine_folder = os.path.join(gesso_root, '.gesso', 'devices', device['name'])
 						if not os.path.exists(machine_folder):
 							print 'mkdir %s' % machine_folder
 							os.makedirs(machine_folder)
