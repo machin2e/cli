@@ -151,7 +151,7 @@ def get_machine_path(name, path=get_builder_root()):
 # TODO: Add to Device/Database class (serves as data access interface/map to device)
 def get_machine_address(name):
 	builder_db_path = get_database_path()
-	db = TinyDB(builder_db_path, default_table='builder')
+	db = TinyDB(builder_db_path, default_table='gesso')
 	device_table = db.table('device')
 
 	device = None
@@ -166,7 +166,7 @@ def get_machine_address(name):
 # Get machines from database
 def get_machines():
 	builder_db_path = get_database_path()
-	db = TinyDB(builder_db_path, default_table='builder')
+	db = TinyDB(builder_db_path, default_table='gesso')
 	device_table = db.table('device')
 
 	#device = None
@@ -216,13 +216,13 @@ def logger(log_name):
 	return logger
 
 def get_data_dir():
-	data_dir = pkg_resources.resource_filename('builder', 'data/')
+	data_dir = pkg_resources.resource_filename('gesso', 'data/')
 	if not os.path.exists(data_dir):
 		return None
 	return data_dir
 
 def get_data_filename(filename):
-	return pkg_resources.resource_filename('builder', 'data/%s' % filename)
+	return pkg_resources.resource_filename('gesso', 'data/%s' % filename)
 
 def setup_builder_dir():
 	return None	

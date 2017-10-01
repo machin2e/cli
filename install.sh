@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Uninstall package (if present)
-sudo pip uninstall builder -y
+sudo pip uninstall gesso -y
 
 # Install package
-cd builder
+cd gesso 
 sudo pip install .
 cd ..

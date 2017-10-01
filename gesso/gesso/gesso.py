@@ -6,7 +6,7 @@ import util
 
 import os # used for git
 
-def builder(command=None):
+def gesso(command=None):
 
 	# Define command-line argument parser
 	parser = argparse.ArgumentParser(description='Builder command-line interpreter.')
@@ -213,4 +213,4 @@ def builder(command=None):
 # "IT'S ACTUALLY FUN TO PROGRAM BY JUMPING AROUND SEEING THE HIGHLIGHTED DEVICE SO YOU KNOW WHERE YOU'RE WORKING, AND SEEING HUD ON PHONE AND IN WINDOWS ON DESKTOP (SUMMONABLE/ASSIGNABLE VIA COMMAND LINE. SHOW UP AS SNAPPABLE WINDOWS. CAN SAVE AND CHANGE VIEWS WITH A COMMAND AS WELL. CAN MAKE ALWAYS ON TOP, TOO.).
 
 if __name__ == "__main__":
-	builder()
+	gesso()

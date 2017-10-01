@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Uninstall current version
-pip uninstall builder -y
+pip uninstall gesso -y
 
 # Check out latest version
 git checkout -- .
 git pull
 
 # Install latest version
-cd builder
+cd gesso
 pip install .
 cd ..
