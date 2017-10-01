@@ -6,7 +6,7 @@ import api
 import git
 import util
 
-def assemble(model_names):
+def assemble(component_identifiers):
 	"""
 	Creates a YAML file describing the ports
 	Arguments:
@@ -21,105 +21,89 @@ def assemble(model_names):
 		  First searches local folder, then model folder, fail to asking to create it (interactively create a device on the CLI with Builder).
 	"""
 
-	model_paths = locate_model_files(model_names)
-	models = load_models(model_paths.values())
-	paths = assemble_components(models)
+	component_paths = find_component_files(component_identifiers)
+	components = load_components(component_paths.values())
+	paths = assemble_components(components)
 
-def locate_model_files(model_names):
+def find_component_files(component_identifiers):
 	"""
-	Accepts list of model names or model filenames.
-	Returns dictionary with keys from input and values as the associated model paths.
+	Accepts list of component identifiers (such as names), filenames, GitHub 
+	repositories (e.g., "machineee/raspberry-pi-3"), or file paths.
+
+	Returns dictionary with keys from input and values as the associated 
+	component paths.
 	"""
 
 	# Prepare and compile regular expressions to validate model identifier tokens.
-	# model_path_regex = r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$'
-	model_path_regex = r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}(\.(yaml)){0,1}$'
-	model_path_pattern = re.compile(model_path_regex)
+	# Matches strings such as:
+	# - without semantic version: "gesso", "arduino", "raspberry-pi-3
+	# - with semantic version: "gesso-3", "gesso-3.0", "gesso-3.0.0"
+	generic_component_identifier_pattern = re.compile(r'^[0-9a-zA-Z_-]+(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}(\.(yaml)){0,1}$')
 
-	# TODO: Validate requested model names. Show warning or error if invalid, and log invalid name. Then output warning/error and instruct user to inspect a log at a specified path for more information.
+	# Matches strings such as:
+	# - "machineee/ir-rangefinder"
+	# - "machineee/raspberry-pi-3"
+	component_github_pattern = re.compile(r'^[A-Za-z0-9-_]+\/[A-Za-z0-9-_]+$')
 
-	print 'Requested Models:'
-	for requested_model in model_names:
-		is_match = model_path_pattern.match(requested_model)
-		print '\t%s\t%s' % ('valid' if is_match is not None else 'invalid', requested_model)
-		#print '\t%s' % requested_model
+	# Validate the requested component identifiers. Halt and show error if 
+	# any are not in a valid format.
+	print 'Requested components (by identifier):'
+	for component_identifier in component_identifiers:
+		is_match = generic_component_identifier_pattern.match(component_identifier)
+		print '\t%s\t%s' % ('valid' if is_match is not None else 'invalid', component_identifier)
 	print ''
 
-	print 'Models Paths:'
-	model_file_paths = {}
+	print 'Component File Paths:'
+	component_file_paths = {}
 	current_dir = util.get_current_dir()
-	for model_name in model_names:
-
-		# TODO: Generate list of paths to search... rather than duplicating code!
+	for component_identifier in component_identifiers:
 
 		# Prepare and compile regular expressions for validating and identifying a model file.
-		model_path_regex = r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % model_name
-		model_path_pattern = re.compile(model_path_regex)
-
-		# Initialize model search process status flags
-		current_dir_match = False
-		library_dir_match = False
-		repository_dir_match = False
-		github_dir_match = False
+		component_path_pattern = re.compile(r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % component_identifier)
 
 		# Search local directory for YAML file (based on input argument)
-		if current_dir_match == False:
+		if component_identifier not in component_file_paths:
 			for file_name in util.get_file_list():
-				is_match = model_path_pattern.match(file_name) is not None
-				if is_match:
-					current_dir_match = True
-					model_file_paths[model_name] = '%s/%s' % (current_dir, file_name)
+				if component_path_pattern.match(file_name) is not None:
+					component_file_paths[component_identifier] = '%s/%s' % (current_dir, file_name)
 
 		# Search library's data/models folder
-		if current_dir_match == False:
-			#data_dir = util.get_data_filename('models/devices')
-			data_dir = util.get_data_filename('')
-			#print 'DATA_DIR:', data_dir
+		if component_identifier not in component_file_paths:
+			data_dir = util.get_data_dir()
 			for file_name in util.get_file_list(data_dir):
-				is_match = model_path_pattern.match(file_name) is not None
-				if is_match:
-					library_dir_match = True
-					model_file_paths[model_name] = '%s%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
+				if component_path_pattern.match(file_name) is not None:
+					component_file_paths[component_identifier] = '%s/%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
 
-		if current_dir_match == False and library_dir_match == False:
+		# Check for GitHub repository identifier
+		if component_identifier not in component_file_paths:
 			# TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
-			github_pattern = re.compile(r'^[A-Za-z0-9-_]+\/[A-Za-z0-9-_]+$')
-			github_dir_match = github_pattern.match(model_name)
+			if component_github_pattern.match(component_identifier) is not None:
+				print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
+				username, repository = component_identifier.split('/')
+				git.clone_github_repository(username, repository)
 
-		if current_dir_match == False and library_dir_match == False and github_dir_match == False:
-			print 'No model file is available for \'%s\'.' % model_name
+		# No component file was found for the specified identifer, so halt and show an error.
+		if component_identifier not in component_file_paths:
+			print "No component file found for '%s'." % component_identifier 
 			# TODO: Log error/warning/info
 			None
-
-		if github_dir_match:
-			print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
-			username, repository = model_name.split('/')
-			git.clone_github_repository(username, repository)
 	
-	for model_name in model_names:
-		print '\t%s => Found model file: %s' % (model_name, model_file_paths[model_name])
+	for component_identifier in component_identifiers:
+		print '\t%s => Found component file: %s' % (component_identifier, component_file_paths[component_identifier])
 	print ''
 	
-	return model_file_paths
+	return component_file_paths 
 
-def load_models(paths):
+def load_components(paths):
 	"""
 	Reads the model files located at the specified paths and returns a list of 
 	model objects.
 	"""
-	models = []
+	components = []
 	for path in paths:
-		model = load_model(path)
-		models.append(model)
-	return models
-
-def load_model(path):
-	"""
-	Reads and parses the model file at the specified path, instantiates a device 
-	object, and returns the instantiated model.
-	"""
-	device = api.Device(path=path)
-	return device
+		component = api.Component(path=path)
+		components.append(component)
+	return components
 
 def determine_state_compatability(state):
 	return None
@@ -289,7 +273,7 @@ def assemble_components(models):
 		# - if not, continue to next power source candidate...
 
 
-	# TODO: Infer hosts or ask user interactively
+	# TODO: Infer hosts or ask user interactively or store in YAML file
 	hosts = ['Raspberry Pi 3']
 
 
@@ -330,9 +314,9 @@ def assemble_components(models):
 
 		print ''
 	
-	# print 'AVAILABLE PATHS:'
-	# for path in paths:
-		# print path
+	print 'AVAILABLE PATHS:'
+	for path in paths:
+		print path
 	
 	# TODO: Generate list of valid paths.
 

@@ -1,11 +1,5 @@
 # Gesso 
 
-Interface types: host; pin/port; protocol (spi, i2c, etc.); procedure (i.e., an RPC stored on a device and exposed as a service network); 
-
-interface vs controller? vs host?
-
-component vs device vs interface vs host
-
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/machineee/home)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

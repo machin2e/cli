@@ -1,13 +1,12 @@
 import yaml
 
 from ..util import util
-
 from port import Port
 
-class Device(object):
+class Component(object):
 
     def __init__(self, path=None):
-        """ The ``Device`` class represents a device.
+        """ The ``Component`` class represents a device.
 
         Args:
             path (str): path to a model yaml file.
@@ -46,19 +45,24 @@ class Device(object):
 
                 self.ports.append(port)
 
-                # Registry URI example:
-                # gesso.network/mokogobo/gesso-8.0.0
-
-
-    # def get_state(self):
-
     def get_ports(self):
         # TODO: return list of ports
         # TODO: device.ports
         return self.ports
 
+    def load_models(paths):
+            """
+            Reads the model files located at the specified paths and returns a list of 
+            model objects.
+            """
+            models = []
+            for path in paths:
+                    model = api.Device(path=path)
+                    models.append(model)
+            return models
+
 """
-device = Device()
+device = Component()
 supported_voltages = device.get_ports()[0].get_model().get_voltages()
 
 is_supported_config = device.get_ports()[0].get_model().get_voltages()

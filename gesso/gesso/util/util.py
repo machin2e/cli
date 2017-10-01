@@ -216,13 +216,16 @@ def logger(log_name):
 	return logger
 
 def get_data_dir():
-	data_dir = pkg_resources.resource_filename('gesso', 'data/')
+	data_dir = pkg_resources.resource_filename('gesso', 'data')
 	if not os.path.exists(data_dir):
 		return None
 	return data_dir
 
 def get_data_filename(filename):
-	return pkg_resources.resource_filename('gesso', 'data/%s' % filename)
+	if filename is '' or filename is None:
+		return pkg_resources.resource_filename('gesso', 'data')
+	else:
+		return pkg_resources.resource_filename('gesso', 'data/%s' % filename)
 
 def setup_gesso_dir():
 	return None	

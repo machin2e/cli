@@ -20,7 +20,7 @@ def gesso(command=None):
 	parser.add_argument('option2', nargs='?', default=None)
 	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with new)')
 	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','gesso'], help='specify role of gesso context (use with new)')
-	parser.add_argument('--component', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
+	parser.add_argument('--component', action='append', dest='component_identifiers', nargs='?', default=[], help='Add component for command.')
 
 	# Parse arguments
 	args = None
@@ -42,7 +42,7 @@ def gesso(command=None):
 	if args.command == 'port':
 		#path = os.path.join(util.get_gesso_root(), '_robot', 'motors', 'right-servo', 'model-device-gesso.yaml')
 		path = os.path.join(util.get_gesso_root(), '.gesso', 'components', 'gesso-8.0.0.yaml')
-		d = api.Device(path=path)
+		d = api.Component(path=path)
 		for port in d.get_ports():
 			print port.mode
 			print port.direction
@@ -98,7 +98,7 @@ def gesso(command=None):
 	
 
 	elif args.command == 'assemble':
-		assemble(args.models)
+		assemble(args.component_identifiers)
 
 	elif args.command == 'project': # app
 		if args.option1 == 'list':
