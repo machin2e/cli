@@ -14,8 +14,8 @@ def gesso(command=None):
 	parser.add_argument('option1', nargs='?', default=None)
 	parser.add_argument('option2', nargs='?', default=None)
 	# TODO: Make these optional arguments only show up for relevant argument trees.
-	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with init)')
-	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','gesso'], help='specify role of gesso context (use with init)')
+	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with new)')
+	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','gesso'], help='specify role of gesso context (use with new)')
 	parser.add_argument('--component', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
 
 	# Parse arguments
@@ -29,20 +29,20 @@ def gesso(command=None):
 	# TODO: Search for all available "gesso_*" files in toolchain and print error with command to repair the toolchain.
 	
 
-	if not args.command == 'init':
+	if not args.command == 'new':
 		if not util.is_gesso_tree():
 			print 'Error: I can\'t do that.'
 			print 'Reason: There is no .gesso directory in the current or parent directories.'
-			print 'Hint: Run `gesso init`.' 
+			print 'Hint: Run `gesso new`.' 
 			return
 
-	# TODO: make sure `gesso init` was called prior to other commands!
+	# TODO: make sure `gesso new` was called prior to other commands!
 
-	# TODO: during `gesso init`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
+	# TODO: during `gesso new`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
 	# TODO: don't worry about filesystem too much for now... just load model (proxy for download), then update state through API... DO THIS IN CONTROLLER? NOT CLI? PROBALBY!!!!!!!
 	if args.command == 'port':
 		#path = os.path.join(util.get_gesso_root(), '_robot', 'motors', 'right-servo', 'model-device-gesso.yaml')
-		path = os.path.join(util.get_gesso_root(), '.gesso', 'devices', 'gesso-8.0.0.yaml')
+		path = os.path.join(util.get_gesso_root(), '.gesso', 'components', 'gesso-8.0.0.yaml')
 		device = api.Device(model_path=path)
 		for port in device.get_ports():
 			print port.mode
@@ -58,7 +58,7 @@ def gesso(command=None):
 		username = args.option1.split('/')[0] # 'machineeeee'
 		repository = args.option1.split('/')[1] # 'raspberry-pi-3'
 
-		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/devices', username, repository))
+		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
 		#git.create_packages_directory()
 		#git.clone_github_repository(username, repository, '%s/%s' % (os.getcwdu(), '.packages'))
 		git.clone_github_repository(username, repository)
@@ -66,15 +66,15 @@ def gesso(command=None):
 		return
 
 
-	if args.command == "init":
-		init(name=args.option1, role=args.role)
+	if args.command == "new":
+		new(name=args.option1, role=args.role)
 
-	elif args.command == 'status':
+	elif args.command == "status":
 		# TODO: Print current status. Ex: 'running', 'paused', 'stopped'
 		None	
 
 	elif args.command == "start":
-		# TODO: for hosts, load their own device file, and the device files for connected peripherals, their controllers, etc.; init in-memory state of board
+		# TODO: for hosts, load their own device file, and the device files for connected peripherals, their controllers, etc.; new in-memory state of board
 		service.manage.start()
 		service.announce.start()
 	elif args.command == "pause":
@@ -123,7 +123,7 @@ def gesso(command=None):
 			None
 		elif args.option1 == 'remove':
 			None
-	elif args.command == 'device':
+	elif args.command == 'component':
 		if args.option1 == 'list':
 			device.list(args.option2)
 		elif args.option1 == 'search':

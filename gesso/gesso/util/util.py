@@ -42,13 +42,13 @@ def get_inet_addresses():
 
 def load_yaml_file(path):
     # TODO: load .yaml file with model for particular (id, version) and populate this model... create __init__ to do that... multiple constructors!
-    #device_model_path = 'model-device-gesso.yaml'
+    #component_model = 'model-component-gesso.yaml'
     yaml_object = None
 
     with open(path, 'r') as file:
         yaml_string = file.read()
         yaml_object = yaml.load(yaml_string)
-        #print device_model
+        #print component_model
         return yaml_object
 
     return None
@@ -115,10 +115,10 @@ def init_workspace_path(path=get_gesso_root()):
 		print 'mkdir %s' % gesso_path 
 		os.makedirs(gesso_path)
 	
-	devices_path = os.path.join(path, '.gesso', 'devices')
-	if not os.path.exists(devices_path):
-		print 'mkdir %s' % devices_path 
-		os.makedirs(devices_path)
+	components_path = os.path.join(path, '.gesso', 'components')
+	if not os.path.exists(components_path):
+		print 'mkdir %s' % components_path 
+		os.makedirs(components_path)
 
 def init_machine_path(name, path=get_gesso_root()):
 
@@ -127,18 +127,18 @@ def init_machine_path(name, path=get_gesso_root()):
 	# Example filesystem:
 	#
 	# .gesso
-	#     /devices
+	#     /components
 	#         /fuzzy-koala
 	#             /vagrant    
 	#                 .Vagrantfile
 
-	machine_path = os.path.join(path, '.gesso', 'devices', name)
+	machine_path = os.path.join(path, '.gesso', 'components', name)
 	if not os.path.exists(machine_path):
 		print 'mkdir %s' % machine_path
 		os.makedirs(machine_path)
 
 	#if virtual:
-	#vagrant_path = os.path.join(path, '.gesso', 'devices', name, 'vagrant')
+	#vagrant_path = os.path.join(path, '.gesso', 'components', name, 'vagrant')
 	#if not os.path.exists(vagrant_path):
 	#	print 'mkdir %s' % vagrant_path
 	#	os.makedirs(vagrant_path)
@@ -146,38 +146,38 @@ def init_machine_path(name, path=get_gesso_root()):
 	return machine_path
 
 def get_machine_path(name, path=get_gesso_root()):
-	return os.path.join(path, '.gesso', 'devices', name)
+	return os.path.join(path, '.gesso', 'components', name)
 
-# TODO: Add to Device/Database class (serves as data access interface/map to device)
+# TODO: Add to Device/Database class (serves as data access interface/map to component)
 def get_machine_address(name):
 	gesso_db_path = get_database_path()
 	db = TinyDB(gesso_db_path, default_table='gesso')
-	device_table = db.table('device')
+	component_table = db.table('component')
 
-	device = None
+	component = None
 
 	Device = Query()
-	device_element = device_table.search(Device.name == name)
-	if len(device_element) > 0:
-		device = device_element[0]
+	component_element = component_table.search(Device.name == name)
+	if len(component_element) > 0:
+		component = component_element[0]
 	
-	return device['address']['ip4']
+	return component['address']['ip4']
 
 # Get machines from database
 def get_machines():
 	gesso_db_path = get_database_path()
 	db = TinyDB(gesso_db_path, default_table='gesso')
-	device_table = db.table('device')
+	component_table = db.table('component')
 
-	#device = None
+	#component = None
 
 	#Device = Query()
-	#device_element = device_table.search(Device.name == name)
-	#if len(device_element) > 0:
-		#device = device_element[0]
+	#component_element = component_table.search(Device.name == name)
+	#if len(component_element) > 0:
+		#component = component_element[0]
 	
-	#return device['address']['ip4']
-	return device_table.all()
+	#return component['address']['ip4']
+	return component_table.all()
 
 def logger(log_name):
 	"""
