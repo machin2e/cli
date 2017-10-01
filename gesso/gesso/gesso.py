@@ -8,12 +8,16 @@ import os # used for git
 
 def gesso(command=None):
 
+	# TODO: Make parsers arguments optional arguments only show up for relevant argument trees.
+	# TODO: make sure `gesso new` was called prior to other commands!
+	# TODO: during `gesso new`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
+	# TODO: don't worry about filesystem too much for now... just load model (proxy for download), then update state through API... DO THIS IN CONTROLLER? NOT CLI? PROBALBY!!!!!!!
+
 	# Define command-line argument parser
-	parser = argparse.ArgumentParser(description='Builder command-line interpreter.')
+	parser = argparse.ArgumentParser(description='Gesso command-line interpreter.')
 	parser.add_argument('command')
 	parser.add_argument('option1', nargs='?', default=None)
 	parser.add_argument('option2', nargs='?', default=None)
-	# TODO: Make these optional arguments only show up for relevant argument trees.
 	parser.add_argument('-v', '--virtual', action='store_true', help='specify virtual machine (use with new)')
 	parser.add_argument('-r', '--role', default='workspace', choices=['workspace','gesso'], help='specify role of gesso context (use with new)')
 	parser.add_argument('--component', action='append', dest='models', nargs='?', default=[], help='Add models for command.')
@@ -27,7 +31,6 @@ def gesso(command=None):
 		args = parser.parse_args()
 
 	# TODO: Search for all available "gesso_*" files in toolchain and print error with command to repair the toolchain.
-	
 
 	if not args.command == 'new':
 		if not util.is_gesso_tree():
@@ -36,35 +39,17 @@ def gesso(command=None):
 			print 'Hint: Run `gesso new`.' 
 			return
 
-	# TODO: make sure `gesso new` was called prior to other commands!
-
-	# TODO: during `gesso new`, load device .yaml files into memory! then can set state and push to device (and sync, eventually)
-	# TODO: don't worry about filesystem too much for now... just load model (proxy for download), then update state through API... DO THIS IN CONTROLLER? NOT CLI? PROBALBY!!!!!!!
 	if args.command == 'port':
 		#path = os.path.join(util.get_gesso_root(), '_robot', 'motors', 'right-servo', 'model-device-gesso.yaml')
 		path = os.path.join(util.get_gesso_root(), '.gesso', 'components', 'gesso-8.0.0.yaml')
-		device = api.Device(model_path=path)
-		for port in device.get_ports():
+		d = api.Device(path=path)
+		for port in d.get_ports():
 			print port.mode
 			print port.direction
 			print port.voltage
 		print port.states
 	
 		return
-
-	# `gesso git machineee/raspberry-pi-3`
-	if args.command == 'git':
-
-		username = args.option1.split('/')[0] # 'machineeeee'
-		repository = args.option1.split('/')[1] # 'raspberry-pi-3'
-
-		print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
-		#git.create_packages_directory()
-		#git.clone_github_repository(username, repository, '%s/%s' % (os.getcwdu(), '.packages'))
-		git.clone_github_repository(username, repository)
-
-		return
-
 
 	if args.command == "new":
 		new(name=args.option1, role=args.role)
@@ -114,7 +99,6 @@ def gesso(command=None):
 
 	elif args.command == 'assemble':
 		assemble(args.models)
-	
 
 	elif args.command == 'project': # app
 		if args.option1 == 'list':
@@ -123,6 +107,7 @@ def gesso(command=None):
 			None
 		elif args.option1 == 'remove':
 			None
+
 	elif args.command == 'component':
 		if args.option1 == 'list':
 			device.list(args.option2)
@@ -143,6 +128,7 @@ def gesso(command=None):
 			device.stop(args.option2)
 		elif args.option1 == 'remove':
 			device.remove(args.option2)
+
 	elif args.command == 'interface':
 		if args.option1 == 'list':
 			None
@@ -207,10 +193,6 @@ def gesso(command=None):
 		print 'Error: I can\'t do that.'
 		print 'Reason: Unrecognized expression.'
 		print 'Hint: Run `gesso help` to see what I can do.'
-
-# TODO: INCORPORATE UDP I/O (LIKE ECHO) INTO LIST TO RETURN STRINGS FROM DEVICES. MAKE "listing" A PARAMETER IN DEVICE Builderfile. / "sync" (if not list): CREATES FOLDERS ON LOCAL SYSTEM FOR DISCOVERED DEVICES (ADD-ONLY UNLESS COMMAND TO CLEANUP/REBASE) WITH SYNC FOLDERS.
-# TODO: COMMAND-LINE IASM. START WITH COMMAND ON A HOST/DEVICE: ./gesso interface add mokogobo/ir-rangefinder ; THEN IT DOWNLOADS THE CONFIG FOR THE FILE, ASKS WHICH PINS TO USE (OR AUTO-SELECT, BASED ON INTERNAL STATE), THEN GIVES YOU ON-SCREEN INSTRUCTIONS TO ASSEMBLE/EDIT STATE.
-# "IT'S ACTUALLY FUN TO PROGRAM BY JUMPING AROUND SEEING THE HIGHLIGHTED DEVICE SO YOU KNOW WHERE YOU'RE WORKING, AND SEEING HUD ON PHONE AND IN WINDOWS ON DESKTOP (SUMMONABLE/ASSIGNABLE VIA COMMAND LINE. SHOW UP AS SNAPPABLE WINDOWS. CAN SAVE AND CHANGE VIEWS WITH A COMMAND AS WELL. CAN MAKE ALWAYS ON TOP, TOO.).
 
 if __name__ == "__main__":
 	gesso()

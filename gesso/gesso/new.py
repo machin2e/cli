@@ -6,7 +6,51 @@ import util
 import json
 import collections # for OrderedDict
 
-def init(name=None, role='workspace'):
+def new(name=None, role='workspace'):
+
+	"""
+	Initializes a workspace with the specified name.
+	"""
+
+	current_path = os.getcwdu()
+
+	# Initialize the workspace directory if the name is available
+	workspace_path = os.path.join(current_path, name)
+	# if os.path.exists(workspace_path):
+		# print "The 
+	if not os.path.exists(workspace_path):
+		os.makedirs(workspace_path)
+		print "Initialized empty workspace in %s." % workspace_path
+
+	# Initialize the '.gesso' directory in the workspace directory.
+	gesso_path = os.path.join(workspace_path, '.gesso')
+	if not os.path.exists(gesso_path):
+		os.makedirs(gesso_path)
+		print "Initialized Glue directory in %s." % gesso_path
+	
+	gesso_dirs = [ os.path.join(gesso_path, 'components'),
+			      os.path.join(gesso_path, 'logs') ]
+
+	for gesso_dir in gesso_dirs:
+		if not os.path.exists(gesso_dir):
+			os.makedirs(gesso_dir)
+	
+	# Initialize workspace with README.md file
+	readme_path = os.path.join(workspace_path, "README.md")
+	if not os.path.exists(readme_path):
+		with open(readme_path, 'w+') as file:
+			file.write("# %s" % name)
+
+
+	# TODO:
+	# - .gesso/config
+	# - .gesso/components/*
+	# - .gesso/logs/*
+	# - README.md
+	# - git repo?
+
+
+	return
 
 	# Check if cwd contains .gesso, or if any of it's parents contain one (if so, we're in a gesso repository)
 	#	If not, create it and populate it with a 'config' file that will contain initial config
@@ -57,7 +101,7 @@ def init(name=None, role='workspace'):
 			with open(system_controller_path, 'w+') as file:
 				file.write(system_controller_source)
 
-		# gesso init zesty-koala --virtual
+		# gesso new zesty-koala --virtual
 		if role == 'gesso':
 			# This is done only gesso devices. Not dev machines!
 			# Add insecure pre-shared SSH public key (to boostrap communications)
@@ -68,4 +112,4 @@ def init(name=None, role='workspace'):
 			os.system('ssh-add %s' % insecure_ssh_private_key)
 
 if __name__ == "__main__":
-	init()
+	new()

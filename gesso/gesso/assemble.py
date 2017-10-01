@@ -3,6 +3,7 @@ import re
 import logging
 
 import api
+import git
 import util
 
 def assemble(model_names):
@@ -21,9 +22,7 @@ def assemble(model_names):
 	"""
 
 	model_paths = locate_model_files(model_names)
-
 	models = load_models(model_paths.values())
-
 	paths = assemble_components(models)
 
 def locate_model_files(model_names):
@@ -84,12 +83,18 @@ def locate_model_files(model_names):
 
 		if current_dir_match == False and library_dir_match == False:
 			# TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
-			None
+			github_pattern = re.compile(r'^[A-Za-z0-9-_]+\/[A-Za-z0-9-_]+$')
+			github_dir_match = github_pattern.match(model_name)
 
 		if current_dir_match == False and library_dir_match == False and github_dir_match == False:
 			print 'No model file is available for \'%s\'.' % model_name
 			# TODO: Log error/warning/info
-                        None
+			None
+
+		if github_dir_match:
+			print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
+			username, repository = model_name.split('/')
+			git.clone_github_repository(username, repository)
 	
 	for model_name in model_names:
 		print '\t%s => Found model file: %s' % (model_name, model_file_paths[model_name])
@@ -113,7 +118,7 @@ def load_model(path):
 	Reads and parses the model file at the specified path, instantiates a device 
 	object, and returns the instantiated model.
 	"""
-	device = api.Device(model_path=path)
+	device = api.Device(path=path)
 	return device
 
 def determine_state_compatability(state):

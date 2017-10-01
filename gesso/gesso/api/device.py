@@ -6,17 +6,17 @@ from port import Port
 
 class Device(object):
 
-    def __init__(self, model_path=None):
+    def __init__(self, path=None):
         """ The ``Device`` class represents a device.
 
         Args:
-            model_path (str): path to a model yaml file.
+            path (str): path to a model yaml file.
         """
         self.name = None
         self.ports = []
 
-        if model_path != None:
-            model = util.load_yaml_file(model_path)
+        if path != None:
+            model = util.load_yaml_file(path)
             
             # Load name from device model file
             if 'name' in model:

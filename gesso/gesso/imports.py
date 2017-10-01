@@ -1,5 +1,5 @@
 from clean import clean
-from init import init
+from new import new
 from list import list
 from sync import sync
 from assemble import assemble
