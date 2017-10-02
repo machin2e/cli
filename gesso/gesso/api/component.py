@@ -16,7 +16,7 @@ class Component(object):
 
         if path != None:
             model = util.load_yaml_file(path)
-            
+
             # Load name from device model file
             if 'name' in model:
                 self.name = model['name']
@@ -28,38 +28,54 @@ class Component(object):
                 # Parse port state space:
                 # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
                 # 2. search for 'states' list
-
                 if 'mode' in port_model and 'direction' in port_model and 'voltage' in port_model:
-                    state = {}
-                    state['mode'] = [port_model['mode']]
-                    state['direction'] = [port_model['direction']]
-                    state['voltage'] = [port_model['voltage']]
+                    state = {
+                            'mode': port_model['mode'],
+                            'direction': port_model['direction'],
+                            'voltage': port_model['voltage']
+                            }
+                    # state['mode'] = [port_model['mode']]
+                    # state['direction'] = [port_model['direction']]
+                    # state['voltage'] = [port_model['voltage']]
                     port.states.append(state)
 
                 elif 'states' in port_model:
                     for state in port_model['states']:
-                        port.states.append(state)
-                        #print state['mode']
-                        #print state['direction']
-                        #print state['voltage']
+                        s = Port.compute_state_set(state)
+                        port.states.extend(s)
+
+                # Compute compatible states for port
+                port.compute_compatible_state_set()
 
                 self.ports.append(port)
+
+        # self.compute_port_dependencies()
+
 
     def get_ports(self):
         # TODO: return list of ports
         # TODO: device.ports
         return self.ports
 
-    def load_models(paths):
+    @staticmethod
+    def open(paths):
             """
-            Reads the model files located at the specified paths and returns a list of 
+            Reads the model files located at the specified paths and returns a list of
             model objects.
             """
-            models = []
+            components = []
             for path in paths:
-                    model = api.Device(path=path)
-                    models.append(model)
-            return models
+                    component = Component(path=path)
+                    components.append(component)
+            return components
+
+    # def compute_port_dependencies(self):
+	# print 'Port Dependencies for %s:' % self.name
+	# for port in self.ports:
+                # port_dependency = port.compute_compatible_state_set()
+                # print '\t%s' % port_dependency
+	# print ''
+
 
 """
 device = Component()
