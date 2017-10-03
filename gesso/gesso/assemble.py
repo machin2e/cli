@@ -45,8 +45,7 @@ def find_component_files(component_identifiers):
 	# - "machineee/ir-rangefinder"
 	# - "machineee/raspberry-pi-3"
 	component_github_pattern = re.compile(r'^[A-Za-z0-9-_]+\/[A-Za-z0-9-_]+$')
-
-	# Validate the requested component identifiers. Halt and show error if 
+# Validate the requested component identifiers. Halt and show error if 
 	# any are not in a valid format.
 	print 'Requested components (by identifier):'
 	for component_identifier in component_identifiers:
@@ -130,19 +129,55 @@ def assemble_components(components):
 			print 'Skipping compatibility search for host %s.\n' % component.name
 			continue
 
-		print 'Searching for compatible ports for %s:' % component.name
+		# print 'Searching for compatible ports for %s:' % component.name
+		print "Let's connect the <%s>." % component.name
 		for port in component.ports:
 			# TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
-			compatible_ports = system.find_compatible_ports(component, port)
+			compatible_state_list = system.find_compatible_ports(port)
+                        # Print the compatible ports (if any).
+                        # For components that provide no compatible ports, print 'None'.
+                        print '\t\tCompatible Ports:'
+                        for compatible_state in compatible_state_list:
+                            print "\t\t\t%s: mode: %s, direction: %s, voltage: %s" % (compatible_state.port.number, compatible_state.mode, compatible_state.direction, compatible_state.voltage)
+
+                            # print "\t\t\t%s:" % compatible_port['port'].component.name
+
+#---
+
+                                # if len(compatible_port_list[component]) == 0:
+                                        # print '\t\t\t%s: None' % component.name
+                                # else:
+                                        # print '\t\t\t%s:' % component.name
+
+                                # for port in compatible_port_list[component]:
+                                        # print '\t\t\t\tPort %s:' % port.number
+                                        # for compatible_port in compatible_port_list[component][port]:
+                                                # print '\t\t\t\t\t%s, %s, %s' % (compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
+
+
+#---
+
+                        # for component in compatible_port_list:
+
+                                # if len(compatible_port_list[component]) == 0:
+                                        # print '\t\t\t%s: None' % component.name
+                                # else:
+                                        # print '\t\t\t%s:' % component.name
+
+                                # for port in compatible_port_list[component]:
+                                        # print '\t\t\t\tPort %s:' % port.number
+                                        # for compatible_port in compatible_port_list[component][port]:
+                                                # print '\t\t\t\t\t%s, %s, %s' % (compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
+
 
 			# Generate list of compatible paths
 			# TODO: Make sure all required information is stored...
-			for compatible_port in compatible_ports:
-				path = api.Path()
-				path.ports.append(port)
-				path.ports.append(compatible_port)
+			# for compatible_port in compatible_ports:
+				# path = api.Path()
+				# path.ports.append(port)
+				# path.ports.append(compatible_port)
 
-				paths.append(path)
+				# paths.append(path)
 
 		print ''
 

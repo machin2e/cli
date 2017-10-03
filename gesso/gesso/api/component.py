@@ -2,6 +2,7 @@ import yaml
 
 from ..util import util
 from port import Port
+from state import State
 
 class Component(object):
 
@@ -24,16 +25,21 @@ class Component(object):
             # Load ports from device model file
             for port_model in model['ports']:
                 port = Port(port_model['number'])
+                port.component = self
 
                 # Parse port state space:
                 # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
                 # 2. search for 'states' list
                 if 'mode' in port_model and 'direction' in port_model and 'voltage' in port_model:
-                    state = {
-                            'mode': port_model['mode'],
-                            'direction': port_model['direction'],
-                            'voltage': port_model['voltage']
-                            }
+                    # state = {
+                            # 'mode': port_model['mode'],
+                            # 'direction': port_model['direction'],
+                            # 'voltage': port_model['voltage']
+                            # }
+                    state = State(port, port_model['mode'], port_model['direction'], port_model['voltage'])
+                    print "\n\n\nSTATE SET:"
+                    print "\t%s; %s; %s" % (state.mode, state.direction, state.voltage)
+                    print "\n\n\n"
                     # state['mode'] = [port_model['mode']]
                     # state['direction'] = [port_model['direction']]
                     # state['voltage'] = [port_model['voltage']]
@@ -41,7 +47,11 @@ class Component(object):
 
                 elif 'states' in port_model:
                     for state in port_model['states']:
-                        s = Port.compute_state_set(state)
+                        s = State.compute_state_set(port, state)
+                        # print "\n\n\nSTATE SET:"
+                        # print "\t%s; %s; %s" % s.
+                        # print "\n\n\n"
+                        # s = State(port)
                         port.states.extend(s)
 
                 # Compute compatible states for port

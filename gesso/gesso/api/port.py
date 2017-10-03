@@ -1,8 +1,12 @@
+from state import State
+
 class Port(object):
 
     # TODO: connected_port(s)
 
     def __init__(self, number, mode=None, direction=None, voltage=None):
+        self.component = None
+
         self.number = number
 
         self.mode = mode if mode is not None else None
@@ -30,37 +34,18 @@ class Port(object):
     def get_compatible_ports(self, device_or_port):
         return ["list", "of", "ports"]
 
-    # def get_interfaces?:
-        # None
-
-    # def add_to_interface?:
-        # None
-
-    @staticmethod
-    def compute_state_set(state):
-        # Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
-        # Search through ALL possible combination pairs for all
-        # mode,direction,voltage combos on ports... and store list of
-        # possibilities!
-        port_configuration_list = []
-        for mode in state['mode']:
-            for direction in state['direction']:
-                for voltage in state['voltage']:
-                    port_configuration_list.append({'mode': mode, 'direction': direction, 'voltage': voltage})
-        return port_configuration_list
-
-    def compute_state_set2(self, state):
-        # Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
-        # Search through ALL possible combination pairs for all
-        # mode,direction,voltage combos on ports... and store list of
-        # possibilities!
-        port_configuration_list = []
-        for mode in state['mode']:
-            for direction in state['direction']:
-                for voltage in state['voltage']:
-                    port_configuration_list.append(
-                        {'mode': mode, 'direction': direction, 'voltage': voltage})
-        return port_configuration_list
+    # @staticmethod
+    # def compute_state_set(state):
+        # # Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
+        # # Search through ALL possible combination pairs for all
+        # # mode,direction,voltage combos on ports... and store list of
+        # # possibilities!
+        # port_configuration_list = []
+        # for mode in state['mode']:
+            # for direction in state['direction']:
+                # for voltage in state['voltage']:
+                    # port_configuration_list.append({'mode': mode, 'direction': direction, 'voltage': voltage})
+        # return port_configuration_list
 
     def compute_compatible_state_set(self):
         """
@@ -74,67 +59,69 @@ class Port(object):
         port connections.
         """
 
+        # TODO: Store these general/unassigned/port-less in a global area so they can be shared. Only the compatible ports will be stored per actual port.
+
         for state in self.states:
 
-            compatible_state = {
-                'mode': None,
-                'direction': None,
-                'voltage': None
-            }
+            # TODO: actually look through the state of other components rather than do this abstract indirect way of searching...
+            compatible_state = State()
 
             # Determine mode compatibility
             # TODO: iterate through all available elements of array (for devices like Pi that have multiple states/configs per port)
             # TODO: change 'mode' to 'role' OR 'function', 'service',
             # 'purpose'?
-            if 'power' == state['mode']:
-                compatible_state['mode'] = 'power'
-            elif 'digital' == state['mode']:
-                compatible_state['mode'] = 'digital'
-            elif 'analog' == state['mode']:  # adc?
-                compatible_state['mode'] = 'analog'
-            elif 'resistive-touch' == state['mode']:
-                compatible_state['mode'] = 'resistive-touch'
-            elif 'pulse-width-modulation' == state['mode']:
+            if 'power' == state.mode:
+                compatible_state.mode = 'power'
+            elif 'digital' == state.mode:
+                compatible_state.mode = 'digital'
+            elif 'analog' == state.mode:  # adc?
+                compatible_state.mode = 'analog'
+            elif 'resistive-touch' == state.mode:
+                compatible_state.mode = 'resistive-touch'
+            elif 'pulse-width-modulation' == state.mode:
                 # alt: PWM, pwm
-                compatible_state['mode'] = 'pulse-width-modulation'
-            elif 'i2c(scl)' == state['mode']:  # alt: I2C(SCL)
-                compatible_state['mode'] = 'i2c(scl)'
-            elif 'i2c(sda)' == state['mode']:  # alt: I2C(SDA)
-                compatible_state['mode'] = 'i2c(sda)'
-            elif 'spi(sclk)' == state['mode']:
-                compatible_state['mode'] = 'spi(sclk)'
-            elif 'spi(mosi)' == state['mode']:
-                compatible_state['mode'] = 'spi(mosi)'
-            elif 'spi(miso)' == state['mode']:
-                compatible_state['mode'] = 'spi(miso)'
-            elif 'spi(ss)' == state['mode']:
-                compatible_state['mode'] = 'spi(ss)'
-            elif 'uart(tx)' == state['mode']:
-                compatible_state['mode'] = 'uart(rx)'
-            elif 'uart(rx)' == state['mode']:
-                compatible_state['mode'] = 'uart(tx)'
+                compatible_state.mode = 'pulse-width-modulation'
+            elif 'i2c(scl)' == state.mode:  # alt: I2C(SCL)
+                compatible_state.mode = 'i2c(scl)'
+            elif 'i2c(sda)' == state.mode:  # alt: I2C(SDA)
+                compatible_state.mode = 'i2c(sda)'
+            elif 'spi(sclk)' == state.mode:
+                compatible_state.mode = 'spi(sclk)'
+            elif 'spi(mosi)' == state.mode:
+                compatible_state.mode = 'spi(mosi)'
+            elif 'spi(miso)' == state.mode:
+                compatible_state.mode = 'spi(miso)'
+            elif 'spi(ss)' == state.mode:
+                compatible_state.mode = 'spi(ss)'
+            elif 'uart(tx)' == state.mode:
+                compatible_state.mode = 'uart(rx)'
+            elif 'uart(rx)' == state.mode:
+                compatible_state.mode = 'uart(tx)'
 
             # Determine direction compatibility
             # TODO: Double-check this logic... it's not complete!
-            if 'input' == state['direction']:
-                compatible_state['direction'] = 'output'
-            elif 'output' == state['direction']:
-                compatible_state['direction'] = 'input'
-            elif 'bidirectional' == state['direction']:
-                compatible_state['direction'] = 'bidirectional'
+            if 'input' == state.direction:
+                compatible_state.direction = 'output'
+            elif 'output' == state.direction:
+                compatible_state.direction = 'input'
+            elif 'bidirectional' == state.direction:
+                compatible_state.direction = 'bidirectional'
 
             # Determine power compatibility
             # TODO: Support voltage ranges! e.g., [3.3v, 5v]
-            if '3.3v' == state['voltage']:
-                compatible_state['voltage'] = '3.3v'
-            elif '5v' == state['voltage']:
-                compatible_state['voltage'] = '5v'
-            elif '0v' == state['voltage']:
-                compatible_state['voltage'] = '0v'
+            if '3.3v' == state.voltage:
+                compatible_state.voltage = '3.3v'
+            elif '5v' == state.voltage:
+                compatible_state.voltage = '5v'
+            elif '0v' == state.voltage:
+                compatible_state.voltage = '0v'
 
             # TODO: verify validity before adding to
             # dependency/compatibility list
-            if compatible_state not in self.compatible_state_set:
-                self.compatible_state_set.append(compatible_state)
+
+            # TODO: if not self.contains_state(cs):
+            # if compatible_state not in self.compatible_state_set:
+                # self.compatible_state_set.append(compatible_state)
+            self.compatible_state_set.append(compatible_state)
 
         print '\t%s' % self.compatible_state_set
