@@ -9,50 +9,44 @@ class Component(object):
     def __init__(self, path=None):
         """ The ``Component`` class represents a device.
 
+        A component stores state individually for each instance and can be
+        configured by passing in parameters using a structure that reprsents
+        the state.
+
         Args:
             path (str): path to a model yaml file.
         """
+
         self.name = None
         self.ports = []
 
         if path != None:
-            model = util.load_yaml_file(path)
+            component_data = util.load_yaml_file(path)
 
-            # Load name from device model file
-            if 'name' in model:
-                self.name = model['name']
+            # Load name from component data file
+            if 'name' in component_data:
+                self.name = component_data['name']
 
-            # Load ports from device model file
-            for port_model in model['ports']:
-                port = Port(port_model['number'])
-                port.component = self
+            # Load host flag from component data file
+            if 'host' in component_data:
+                self.host = component_data['host']
+            else:
+                self.host = False
+
+            # Load ports from component data file
+            for port_data in component_data['ports']:
+                port = Port(self, port_data['number'])
 
                 # Parse port state space:
                 # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
                 # 2. search for 'states' list
-                if 'mode' in port_model and 'direction' in port_model and 'voltage' in port_model:
-                    # state = {
-                            # 'mode': port_model['mode'],
-                            # 'direction': port_model['direction'],
-                            # 'voltage': port_model['voltage']
-                            # }
-                    state = State(port, port_model['mode'], port_model['direction'], port_model['voltage'])
-                    print "\n\n\nSTATE SET:"
-                    print "\t%s; %s; %s" % (state.mode, state.direction, state.voltage)
-                    print "\n\n\n"
-                    # state['mode'] = [port_model['mode']]
-                    # state['direction'] = [port_model['direction']]
-                    # state['voltage'] = [port_model['voltage']]
-                    port.states.append(state)
-
-                elif 'states' in port_model:
-                    for state in port_model['states']:
-                        s = State.compute_state_set(port, state)
-                        # print "\n\n\nSTATE SET:"
-                        # print "\t%s; %s; %s" % s.
-                        # print "\n\n\n"
-                        # s = State(port)
-                        port.states.extend(s)
+                if 'mode' in port_data and 'direction' in port_data and 'voltage' in port_data:
+                    configuration = State(port, port_data['mode'], port_data['direction'], port_data['voltage'])
+                    port.states.append(configuration)
+                elif 'states' in port_data:
+                    for configuration_data in port_data['states']:
+                        configuration = State.compute_state_set(port, configuration_data)
+                        port.states.extend(configuration)
 
                 # Compute compatible states for port
                 port.compute_compatible_state_set()

@@ -48,7 +48,7 @@ def gesso(command=None):
 			print port.direction
 			print port.voltage
 		print port.states
-	
+
 		return
 
 	if args.command == "new":
@@ -95,7 +95,7 @@ def gesso(command=None):
 			service.watchdir.run()
 		elif args.option1 == 'stop':
 			None
-	
+
 
 	elif args.command == 'assemble':
 		assemble(args.component_identifiers)

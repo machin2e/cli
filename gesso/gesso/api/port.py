@@ -4,29 +4,17 @@ class Port(object):
 
     # TODO: connected_port(s)
 
-    def __init__(self, number, mode=None, direction=None, voltage=None):
-        self.component = None
+    def __init__(self, component, number):
+
+        self.component = component
 
         self.number = number
 
-        self.mode = mode if mode is not None else None
-        self.direction = direction if direction is not None else None
-        self.voltage = voltage if voltage is not None else None
-
+        self.state = None # This must be one of the states in the port's list of states
         self.states = []
 
         # state
-        self.connected_port = []
-
         self.compatible_state_set = []
-
-    def configure(self, mode=None, direction=None, voltage=None):
-        """ Sets the state of the `Port` if it is valid.
-        """
-        self.mode = mode or self.mode
-        self.direction = direction or self.direction
-        self.voltage = voltage or self.voltage
-        None
 
     def get_device(self):
         return None
@@ -124,4 +112,109 @@ class Port(object):
                 # self.compatible_state_set.append(compatible_state)
             self.compatible_state_set.append(compatible_state)
 
-        print '\t%s' % self.compatible_state_set
+        # print '\t%s' % self.compatible_state_set
+
+    # TODO: locate_compatible_interface(...)
+    def find_compatible_ports(self, components, include_component_ports=False):
+	"""
+	Locates a port on the specified model that matches the specfied port_dependency.
+	todo: parallelize this function... so many nested loops!
+
+        If the `include_component_ports` is True, then the ports on the source
+        component will be included in the search for ports. This enables the
+        component to connect its ports to each other.
+	"""
+
+	print '\tPort %s on %s:' % (self.number, self.component.name)
+	print '\t\tStates: %s' % self.states
+	print '\t\tDependencies: %s' % self.compatible_state_set
+
+        compatible_ports = []
+	for component in components:
+
+		# Prevent attempt to search for compatible ports on the same component 
+		# TODO: Add option to enable searching on the same component 
+                if include_component_ports and component is self.component:
+                        continue
+
+		# print 'Port Dependencies for %s:' % model.name
+		for port in component.ports:
+
+			for state in port.states:
+
+				# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
+				# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+				# TODO: expand this state sooner? or use cached computation?
+				# port_configuration_list = port.compute_state_set(state)
+
+				# Determine compatible ports
+				for compatible_state in self.compatible_state_set:
+
+                                        if State.compare(state, compatible_state):
+
+                                                # Just-in-time initialize storage for compatible port states on other component's port to empty list
+
+                                                compatible_ports.append(port)
+
+	return compatible_ports
+
+    # TODO: locate_compatible_interface(...)
+    def find_compatible_states(self, components, include_component_ports=False):
+	"""
+	Locates a port on the specified model that matches the specfied port_dependency.
+	todo: parallelize this function... so many nested loops!
+
+        If the `include_component_ports` is True, then the ports on the source
+        component will be included in the search for ports. This enables the
+        component to connect its ports to each other.
+	"""
+
+	print '\tPort %s on %s:' % (self.number, self.component.name)
+
+	print '\t\tStates:'
+        for state in self.states:
+            print "\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage)
+
+	print '\t\tDependencies:'
+        for state in self.compatible_state_set:
+            print "\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage)
+
+        compatible_components = []
+        compatible_ports = []
+        compatible_states = []
+
+	for component in components:
+
+		# Prevent attempt to search for compatible ports on the same component 
+		# TODO: Add option to enable searching on the same component 
+                if include_component_ports and component is self.component:
+                        continue
+
+		# print 'Port Dependencies for %s:' % model.name
+		for port in component.ports:
+
+			for state in port.states:
+
+				# Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
+				# Search through ALL possible combination pairs for all mode,direction,voltage combos on ports... and store list of possibilities!
+				# TODO: expand this state sooner? or use cached computation?
+				# port_configuration_list = port.compute_state_set(state)
+
+				# Determine compatible ports
+				for compatible_state in self.compatible_state_set:
+
+                                        if State.compare(state, compatible_state):
+
+                                                # Just-in-time initialize storage for compatible port states on other component's port to empty list
+
+                                                if component not in compatible_components:
+                                                    compatible_components.append(component)
+
+                                                if port not in compatible_ports:
+                                                    compatible_ports.append(port)
+
+                                                if state not in compatible_states:
+                                                    compatible_states.append(state)
+
+	# return compatible_states
+	return (compatible_components, compatible_ports, compatible_states)
