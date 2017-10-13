@@ -2,6 +2,7 @@
 uuid: 18ce7b13-6ddb-43ac-b4dd-b9293e0da554
 name: Raspberry Pi 3
 version: 1.0.0
+host: true
 ports:
     - id: <uuid>
       number: 1

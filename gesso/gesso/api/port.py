@@ -187,7 +187,7 @@ class Port(object):
 
 		# Prevent attempt to search for compatible ports on the same component 
 		# TODO: Add option to enable searching on the same component 
-                if include_component_ports and component is self.component:
+                if not include_component_ports and component is self.component:
                         continue
 
 		# print 'Port Dependencies for %s:' % model.name

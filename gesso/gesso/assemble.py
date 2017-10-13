@@ -77,27 +77,27 @@ def find_component_files(component_identifiers):
 		component_path_pattern = re.compile(r'^%s(-(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)){0,1}\.(yaml)$' % component_identifier)
 
 		# Search local directory for YAML file (based on input argument)
-		# if component_identifier not in component_file_paths:
-                for file_name in util.get_file_list():
-                        if component_path_pattern.match(file_name) is not None:
-                                component_file_paths[component_identifier] = '%s/%s' % (current_dir, file_name)
-                                path_list.append('%s/%s' % (current_dir, file_name))
+		if component_identifier not in component_file_paths:
+                    for file_name in util.get_file_list():
+                            if component_path_pattern.match(file_name) is not None:
+                                    component_file_paths[component_identifier] = '%s/%s' % (current_dir, file_name)
+                                    path_list.append('%s/%s' % (current_dir, file_name))
 
 		# Search library's data/models folder
-		# if component_identifier not in component_file_paths:
-                data_dir = util.get_data_dir()
-                for file_name in util.get_file_list(data_dir):
-                        if component_path_pattern.match(file_name) is not None:
-                                component_file_paths[component_identifier] = '%s/%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
-                                path_list.append('%s/%s' % (data_dir, file_name))
+		if component_identifier not in component_file_paths:
+                    data_dir = util.get_data_dir()
+                    for file_name in util.get_file_list(data_dir):
+                            if component_path_pattern.match(file_name) is not None:
+                                    component_file_paths[component_identifier] = '%s/%s' % (data_dir, file_name) # TODO: data_dir shouldn't end in '/'
+                                    path_list.append('%s/%s' % (data_dir, file_name))
 
 		# Check for GitHub repository identifier
-		# if component_identifier not in component_file_paths:
-			# TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
-                if component_github_pattern.match(component_identifier) is not None:
-                        print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
-                        username, repository = component_identifier.split('/')
-                        git.clone_github_repository(username, repository)
+                if component_identifier not in component_file_paths:
+                    # TODO: Write function to load model file from a GitHub repository specified with format 'username/repo'
+                    if component_github_pattern.match(component_identifier) is not None:
+                            print('Cloning %s/%s to %s/%s/%s' % (username, repository, '.gesso/components', username, repository))
+                            username, repository = component_identifier.split('/')
+                            git.clone_github_repository(username, repository)
 
 		# No component file was found for the specified identifer, so halt and show an error.
 		# if component_identifier not in component_file_paths:
@@ -134,17 +134,22 @@ def assemble_components(components):
 
 
 	# TODO: Infer hosts or ask user interactively or store in YAML file
-	hosts = ['Raspberry Pi 3']
+	hosts = []
+        for component in system.components:
+            # if component.name == 'Raspberry Pi 3':
+            if component.host:
+                hosts.append(component)
 
 
-
-	paths = []
+	paths = {}
 
 	for component in system.components:
 
-		if component.name in hosts:
+		if component in hosts:
 			print 'Skipping compatibility search for host %s.\n' % component.name
 			continue
+
+                paths[component] = {}
 
 		# print 'Searching for compatible ports for %s:' % component.name
 		print "Let's connect the <%s>." % component.name
@@ -155,37 +160,15 @@ def assemble_components(components):
                         compatibility = port.find_compatible_states(system.components)
                         compatible_state_list = compatibility[2] # compatible_state_list = port.find_compatible_states(system.components)
 
-			#compatible_state_list = component.find_compatible_components(system.components)
-			#compatible_state_list = port.find_compatible_ports(system.components)
-			#compatible_state_list = port.find_compatible_states(other_ports)
-                        # component.find_compatible_components(component_list_or_system)
-                        # port.find_compatible_ports(other_component_or_components)
-                        # port.find_compatible_states(other_port)
-                        # state.find_compatible_
-                        # 
-                        # 
-
                         # Print the compatible states and corresponding ports (if any).
                         # For components that provide no compatible ports, print 'None'.
                         print '\t\tCompatible Ports:'
                         for compatible_state in compatible_state_list:
                             print "\t\t\t%s: mode: %s, direction: %s, voltage: %s" % (compatible_state.port.number, compatible_state.mode, compatible_state.direction, compatible_state.voltage)
+
+                            if port not in paths:
+                                paths[component][port] = { 'port': compatible_state.port, 'state': compatible_state }
                             # print "\t\t\tPort %s:" % compatible_state.number
-
-#---
-
-                        # for component in compatible_port_list:
-
-                                # if len(compatible_port_list[component]) == 0:
-                                        # print '\t\t\t%s: None' % component.name
-                                # else:
-                                        # print '\t\t\t%s:' % component.name
-
-                                # for port in compatible_port_list[component]:
-                                        # print '\t\t\t\tPort %s:' % port.number
-                                        # for compatible_port in compatible_port_list[component][port]:
-                                                # print '\t\t\t\t\t%s, %s, %s' % (compatible_port['state']['mode'], compatible_port['state']['direction'], compatible_port['state']['voltage'])
-
 
 			# Generate list of compatible paths
 			# TODO: Make sure all required information is stored...
@@ -195,12 +178,14 @@ def assemble_components(components):
 				# path.ports.append(compatible_port)
 
 				# paths.append(path)
-
 		print ''
 
 	print 'AVAILABLE PATHS:'
-	for path in paths:
-		print path
+	for source_component in paths.keys():
+		# print path['port']
+                for source_port in paths[source_component].keys():
+                    print 'from %s port %s --> %s port %s' % (source_component.name, source_port.number, paths[source_component][source_port]['port'].component.name, paths[source_component][source_port]['port'].number)
+
 
 	# TODO: Generate list of valid paths.
 
