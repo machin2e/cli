@@ -1,30 +1,27 @@
 # models are only adjacent to controller files
-
 #parent:
 #	id: <uuid>
 #	version: <version>
-
-id: <uuid>
 name: IR Rangefinder
 ports:
-    - id: <uuid>
       #label: ground
-      number: 1
-      mode: power
-      direction: input # source, target? sink/common?
-      voltage: 3.3v # TODO: Support voltage ranges
+    - number: 1
+      states:
+          - mode: [power]
+            direction: [input] # source, target? sink/common?
+            voltage: [3.3v] # TODO: Support voltage ranges
       #power: volts(5)
       #power: volts(5-10)
       #power: common
-    - id: <uuid>
       #label: signal
-      number: 2
-      mode: analog # requires: adc OR analog input
-      direction: output
-      voltage: 3.3v
-    - id: <uuid>
+    - number: 2
+      states:
+          - mode: [analog] # requires: adc OR analog input
+            direction: [output]
+            voltage: [3.3v]
       #label: power
-      number: 3
-      mode: power
-      direction: bidirectional # common
-      voltage: 0v
+    - number: 3
+      states:
+          - mode: [power]
+            direction: [bidirectional] # common
+            voltage: [0v]

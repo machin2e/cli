@@ -1,11 +1,11 @@
 class State(object):
 
-    def __init__(self, port=None, mode=None, direction=None, voltage=None):
+    def __init__(self, port=None, state_dict=None):
         self.port = port
 
-        self.mode = mode
-        self.direction = direction
-        self.voltage = voltage
+        self.mode = state_dict['mode'] if state_dict is not None else None
+        self.direction = state_dict['direction'] if state_dict is not None else None
+        self.voltage = state_dict['voltage'] if state_dict is not None else None
 
         self.__compatible_states = []
 
@@ -15,9 +15,6 @@ class State(object):
         # else:
             # return False
 
-    def get_compatible_states(self):
-        return self.__compatible_states
-
     @staticmethod
     def compare(state, other):
         if state.mode == other.mode and state.direction == other.direction and state.voltage == other.voltage:
@@ -26,7 +23,7 @@ class State(object):
             return False
 
     @staticmethod
-    def compute_states(port, state_combination):
+    def compute_states(port, states_dict):
         """
         Expands the state expression into discrete states and returns an array
         containing the discrete states.
@@ -36,11 +33,15 @@ class State(object):
         # mode,direction,voltage combos on ports... and store list of
         # possibilities!
 
-        port_configuration_list = []
-        for mode in state_combination['mode']:
-            for direction in state_combination['direction']:
-                for voltage in state_combination['voltage']:
-                    # port_configuration_list.append({'mode': mode, 'direction': direction, 'voltage': voltage})
-                    state = State(port, mode, direction, voltage)
-                    port_configuration_list.append(state)
-        return port_configuration_list
+        port_states = []
+        for mode in states_dict['mode']:
+            for direction in states_dict['direction']:
+                for voltage in states_dict['voltage']:
+                    state = State(port, {'mode': mode, 'direction': direction, 'voltage': voltage})
+                    # state = State(port, mode, direction, voltage)
+                    port_states.append(state)
+        return port_states 
+
+    def get_compatible_states(self):
+        return self.__compatible_states
+

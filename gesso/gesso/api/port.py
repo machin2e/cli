@@ -1,35 +1,22 @@
 from state import State
-
 from ..util import util
 
 class Port(object):
-
-    # TODO: connected_port(s)
 
     def __init__(self, component, port_dict):
 
         self.component = component
         self.number = port_dict['number']
-
-
-        self.state = None # This must be one of the states in the port's list of states
         self.states = []
 
-        # state
         self.__compatible_ports = []
-        # self.compatible_state_set = []
-
 
         # Parse port state space:
         # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
         # 2. search for 'states' list
-        if 'mode' in port_dict and 'direction' in port_dict and 'voltage' in port_dict:
-            configuration = State(self, port_dict['mode'], port_dict['direction'], port_dict['voltage'])
-            self.states.append(configuration)
-        elif 'states' in port_dict:
-            for configuration_data in port_dict['states']:
-                configuration = State.compute_states(self, configuration_data)
-                self.states.extend(configuration)
+        for states_dict in port_dict['states']:
+            state = State.compute_states(self, states_dict)
+            self.states.extend(state)
 
         # Compute compatible states for port
         Port.compute_compatible_states(self)

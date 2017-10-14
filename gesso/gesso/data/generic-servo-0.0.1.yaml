@@ -4,15 +4,15 @@
 #	id: <uuid>
 #	version: <version>
 
-id: <uuid>
 name: Micro Servo
+description: Generic micro servo.
 ports:
-    - id: <uuid>
       #label: ground
-      number: 1
-      mode: power
-      direction: input
-      voltage: 3.3v # TODO: Support voltage ranges
+    - number: 1
+      states:
+          - mode: [power]
+            direction: [input]
+            voltage: [3.3v] # TODO: Support voltage ranges
       #states:
       #    - mode: digital
       #      direction: output
@@ -21,18 +21,17 @@ ports:
       #power: volts(5)
       #power: volts(5-10)
       #power: common
-    - id: <uuid>
-      #label: signal
-      number: 2
-      mode: pulse-width-modulation # alt: pwm
-      direction: input # alt: in
-      voltage: 3.3v
-    - id: <uuid>
+    - number: 2
+      states:
+          - mode: [pulse-width-modulation] # alt: pwm
+            direction: [input] # alt: in
+            voltage: [3.3v]
       #label: power
-      number: 3
-      mode: power
-      direction: bidirectional # alt: bi
-      voltage: 0v
+    - number: 3
+      states:
+          - mode: [power]
+            direction: [bidirectional] # alt: bi
+            voltage: [0v]
       # power: voltage(3.3v)
       # power: common
       #
