@@ -1,6 +1,6 @@
 # Gesso 
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/machineee/home)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/gesso/home)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Thank you for checking out Gesso. We're changing Gesso every day as we crank out the [roadmap]() and make tweaks along the way. If you want to help out, learn how to do so in the [contribution](#contribute) section. Thanks for bearing with us :bear:!
@@ -15,7 +15,7 @@ This repository contains:
 Install with the following command. You may want to prefix the command with `sudo`.
 
 ```
-pip install git+https://github.com/machineeeee/gesso
+pip install git+https://github.com/gesso/gesso
 ```
 
 ## Getting Started
@@ -55,7 +55,7 @@ TODO
 Gesso is a command line application. It can be used by running commands like this one:
 
 ```
-gesso connect --model raspberry-pi-3 --model machineee/generic-servo --model ir-rangefinder --model ir-rangefinder
+gesso compose --component raspberry-pi-3 --component gesso/generic-servo --component ir-rangefinder --component ir-rangefinder
 ```
 
 ### `gesso new`
@@ -86,7 +86,7 @@ signup
 login
 help
 note [add|remove|list]		Used to add, remove, or list notes for a device or environment/workspace/project.
-assemble			Starts interactive self-assembly.
+compose			Starts interactive self-assembly.
 start [broadcast|discover]
 status [broadcast|discover]
 run [broadcast|discover]
@@ -181,7 +181,7 @@ TODO
 ### Usage
 
 ```
-gesso connect --model raspberry-pi-3 --model machineee/generic-servo --model ir-rangefinder --model ir-rangefinder
+gesso compose --component raspberry-pi-3 --component gesso/generic-servo --component ir-rangefinder --component ir-rangefinder
 ```
 
 #### `gesso new`
@@ -226,18 +226,18 @@ Previously `gesso device`. May revert. Still sorting out the terminology that wi
 
 #### `gesso signup`
 
-Assists you in creating an account for accessing the Machineee platform. You must use your GitHub account.
+Assists you in creating an account for accessing the Gesso platform. You must use your GitHub account.
 
 #### `gesso login`
 
-Logs you in with Machineee account credentials. If run from a project workspace, only the project will be associated with the account.
+Logs you in with Gesso account credentials. If run from a project workspace, only the project will be associated with the account.
 
 **Proposed Commands**
 
 ```
 help
 note [add|remove|list]		Used to add, remove, or list notes for a device or environment/workspace/project.
-assemble			Starts interactive self-assembly.
+compose			Starts interactive self-assembly.
 start [broadcast|discover]
 status [broadcast|discover]
 run [broadcast|discover]
@@ -250,7 +250,7 @@ gesso announce: Starts broadcasting the device on the network, making it discove
 
 ## API
 
-This repository contains the Python API for using hardware resources, mesh and Internet network services and resources, and the Machineee servers.
+This repository contains the Python API for using hardware resources, mesh and Internet network services and resources, and the Gesso servers.
 
 The API will include interfaces for:
 - Port and protocol physical I/O.

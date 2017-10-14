@@ -6,7 +6,7 @@ from state import State
 
 class Component(object):
 
-    def __init__(self, component_dict=None):
+    def __init__(self, path=None):
         """ The ``Component`` class represents a device.
 
         A component stores state individually for each instance and can be
@@ -20,20 +20,42 @@ class Component(object):
         self.name = None
         self.ports = []
 
-        # Load name from component data file
-        if 'name' in component_dict:
-            self.name = component_dict['name']
+        if path != None:
+            component_data = util.load_yaml_file(path)
 
-        # Load host flag from component data file
-        if 'host' in component_dict:
-            self.host = component_dict['host']
-        else:
-            self.host = False
+            # Load name from component data file
+            if 'name' in component_data:
+                self.name = component_data['name']
 
-        # Load ports from component data file
-        for port_dict in component_dict['ports']:
-            port = Port(self, port_dict)
-            self.ports.append(port)
+            # Load host flag from component data file
+            if 'host' in component_data:
+                self.host = component_data['host']
+            else:
+                self.host = False
+
+            # Load ports from component data file
+            for port_data in component_data['ports']:
+                port = Port(self, port_data['number'])
+
+                # Parse port state space:
+                # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
+                # 2. search for 'states' list
+                if 'mode' in port_data and 'direction' in port_data and 'voltage' in port_data:
+                    configuration = State(port, port_data['mode'], port_data['direction'], port_data['voltage'])
+                    port.states.append(configuration)
+                elif 'states' in port_data:
+                    for configuration_data in port_data['states']:
+                        configuration = State.compute_states(port, configuration_data)
+                        port.states.extend(configuration)
+
+                # Compute compatible states for port
+                Port.compute_compatible_states(port)
+                print "COMPATIBLE STATES:"
+                for s in port.states:
+                    for cs in s.get_compatible_states():
+                        print '\t%s' % cs
+
+                self.ports.append(port)
 
         # self.compute_port_dependencies()
 
@@ -51,9 +73,7 @@ class Component(object):
             """
             components = []
             for path in paths:
-                if path != None:
-                    component_dict = util.load_yaml_file(path)
-                    component = Component(component_dict)
+                    component = Component(path=path)
                     components.append(component)
             return components
 

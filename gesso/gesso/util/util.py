@@ -179,15 +179,16 @@ def get_machines():
 	#return component['address']['ip4']
 	return component_table.all()
 
-def logger(log_name):
+def logger(log_name, exclude_prefix=False):
 	"""
 	Returns a logger for the log located at '.gesso/logs/<log_name>'.
 	If the log doesn't exist, creates it in the '.gesso/logs' directory.
+
+        exclude_prefix : If set to `True`, this will remove per-line prefixes
+                         from the output written to the file.
 	"""
 
-	#current_dir = os.getcwdu()
 	gesso_root = get_gesso_root()
-	#TODO: if gesso_root != None:
 
 	gesso_folder = os.path.join(gesso_root, '.gesso')
 	if not os.path.exists(gesso_folder):
@@ -196,7 +197,7 @@ def logger(log_name):
 
 	log_folder = os.path.join(gesso_root, '.gesso', 'logs')
 	if not os.path.exists(log_folder):
-		print 'mkdir %s' % log_folder 
+		print 'mkdir %s' % log_folder
 		os.makedirs(log_folder)
 
 	logfile_name = '%s.log' % log_name
@@ -208,8 +209,10 @@ def logger(log_name):
 	fh = logging.FileHandler(logfile_path)
 	fh.setLevel(logging.DEBUG)
 	# Create formatter and add it to handlers
-	formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-	fh.setFormatter(formatter)
+        if not exclude_prefix:
+            formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+            fh.setFormatter(formatter)
+
 	logger.addHandler(fh)
 
 	#return logfile_path

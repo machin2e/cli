@@ -7,11 +7,16 @@ class State(object):
         self.direction = direction
         self.voltage = voltage
 
+        self.__compatible_states = []
+
     # def __eq__(self, other):
         # if isinstance(other, self.__class__):
             # return self.__dict__ == other.__dict__
         # else:
             # return False
+
+    def get_compatible_states(self):
+        return self.__compatible_states
 
     @staticmethod
     def compare(state, other):
@@ -21,7 +26,7 @@ class State(object):
             return False
 
     @staticmethod
-    def compute_state_set(port, state_combination):
+    def compute_states(port, state_combination):
         """
         Expands the state expression into discrete states and returns an array
         containing the discrete states.

@@ -1,41 +1,54 @@
 from state import State
 
+from ..util import util
+
 class Port(object):
 
     # TODO: connected_port(s)
 
-    def __init__(self, component, number):
+    def __init__(self, component, port_dict):
 
         self.component = component
+        self.number = port_dict['number']
 
-        self.number = number
 
         self.state = None # This must be one of the states in the port's list of states
         self.states = []
 
         # state
-        self.compatible_state_set = []
+        self.__compatible_ports = []
+        # self.compatible_state_set = []
 
-    def get_device(self):
-        return None
 
-    def get_compatible_ports(self, device_or_port):
-        return ["list", "of", "ports"]
+        # Parse port state space:
+        # 1. search for 'mode', 'direction', 'voltage' (a) values or (b) lists of values
+        # 2. search for 'states' list
+        if 'mode' in port_dict and 'direction' in port_dict and 'voltage' in port_dict:
+            configuration = State(self, port_dict['mode'], port_dict['direction'], port_dict['voltage'])
+            self.states.append(configuration)
+        elif 'states' in port_dict:
+            for configuration_data in port_dict['states']:
+                configuration = State.compute_states(self, configuration_data)
+                self.states.extend(configuration)
+
+        # Compute compatible states for port
+        Port.compute_compatible_states(self)
 
     # @staticmethod
-    # def compute_state_set(state):
-        # # Compute complete list of the available configurations of the port (FOR A PARTICULAR STATE STATE)
-        # # Search through ALL possible combination pairs for all
-        # # mode,direction,voltage combos on ports... and store list of
-        # # possibilities!
-        # port_configuration_list = []
-        # for mode in state['mode']:
-            # for direction in state['direction']:
-                # for voltage in state['voltage']:
-                    # port_configuration_list.append({'mode': mode, 'direction': direction, 'voltage': voltage})
-        # return port_configuration_list
+    # def Port.get_compatible_states(ports):
+        # """
+        # Takes a list of ports, iterates over their compatible ports, and adds
+        # the compatible states for each of the port's states to a list, then
+        # returns the list of compatible states.
+        # """
+        # compatible
+        # for compatible_port in ports.compatible_ports:
 
-    def compute_compatible_state_set(self):
+    def get_compatible_ports(self):
+        return self.__compatbile_ports
+
+    @staticmethod
+    def compute_compatible_states(port):
         """
         Uses the port's computed state set (expanded from the configuration)
         to compute the corresponding, or compatible, states. One or more of
@@ -49,7 +62,7 @@ class Port(object):
 
         # TODO: Store these general/unassigned/port-less in a global area so they can be shared. Only the compatible ports will be stored per actual port.
 
-        for state in self.states:
+        for state in port.states:
 
             # TODO: actually look through the state of other components rather than do this abstract indirect way of searching...
             compatible_state = State()
@@ -108,11 +121,7 @@ class Port(object):
             # dependency/compatibility list
 
             # TODO: if not self.contains_state(cs):
-            # if compatible_state not in self.compatible_state_set:
-                # self.compatible_state_set.append(compatible_state)
-            self.compatible_state_set.append(compatible_state)
-
-        # print '\t%s' % self.compatible_state_set
+            state._State__compatible_states.append(compatible_state)
 
     # TODO: locate_compatible_interface(...)
     def find_compatible_ports(self, components, include_component_ports=False):
@@ -125,11 +134,13 @@ class Port(object):
         component to connect its ports to each other.
 	"""
 
-	print '\tPort %s on %s:' % (self.number, self.component.name)
-	print '\t\tStates: %s' % self.states
-	print '\t\tDependencies: %s' % self.compatible_state_set
+        logger = util.logger("composer", exclude_prefix=True)
 
-        compatible_ports = []
+	logger.info('\tPort %s on %s:' % (self.number, self.component.name))
+	logger.info('\t\tStates: %s' % self.states)
+	# logger.info('\t\tDependencies: %s' % self.compatible_state_set)
+
+        # compatible_ports = []
 	for component in components:
 
 		# Prevent attempt to search for compatible ports on the same component 
@@ -148,15 +159,14 @@ class Port(object):
 				# port_configuration_list = port.compute_state_set(state)
 
 				# Determine compatible ports
-				for compatible_state in self.compatible_state_set:
+				# for compatible_state in self.get_compatible_states():
+                                for this_state in self.states:
+                                        for compatible_state in this_state.get_compatible_states():
+                                            if State.compare(state, compatible_state):
+                                                    # Just-in-time initialize storage for compatible port states on other component's port to empty list
+                                                    self.__compatible_ports.append(port)
 
-                                        if State.compare(state, compatible_state):
-
-                                                # Just-in-time initialize storage for compatible port states on other component's port to empty list
-
-                                                compatible_ports.append(port)
-
-	return compatible_ports
+	return self.__compatible_ports
 
     # TODO: locate_compatible_interface(...)
     def find_compatible_states(self, components, include_component_ports=False):
@@ -169,15 +179,14 @@ class Port(object):
         component to connect its ports to each other.
 	"""
 
-	print '\tPort %s on %s:' % (self.number, self.component.name)
-
-	print '\t\tStates:'
+        logger = util.logger("composer", exclude_prefix=True)
+	logger.info('\tPort %s on %s:' % (self.number, self.component.name))
+	logger.info('\t\tStates:')
         for state in self.states:
-            print "\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage)
-
-	print '\t\tDependencies:'
-        for state in self.compatible_state_set:
-            print "\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage)
+            logger.info("\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage))
+	logger.info('\t\tDependencies:')
+        # for state in self.get_compatible_states():
+            # logger.info("\t\t\t(%s, %s, %s)" % (state.mode, state.direction, state.voltage))
 
         compatible_components = []
         compatible_ports = []
@@ -201,20 +210,22 @@ class Port(object):
 				# port_configuration_list = port.compute_state_set(state)
 
 				# Determine compatible ports
-				for compatible_state in self.compatible_state_set:
+				# for compatible_state in self.get_compatible_states():
+                                for this_state in self.states:
+                                        for compatible_state in this_state.get_compatible_states():
 
-                                        if State.compare(state, compatible_state):
+                                            if State.compare(state, compatible_state):
 
-                                                # Just-in-time initialize storage for compatible port states on other component's port to empty list
+                                                    # Just-in-time initialize storage for compatible port states on other component's port to empty list
 
-                                                if component not in compatible_components:
-                                                    compatible_components.append(component)
+                                                    if component not in compatible_components:
+                                                        compatible_components.append(component)
 
-                                                if port not in compatible_ports:
-                                                    compatible_ports.append(port)
+                                                    if port not in compatible_ports:
+                                                        compatible_ports.append(port)
 
-                                                if state not in compatible_states:
-                                                    compatible_states.append(state)
+                                                    if state not in compatible_states:
+                                                        compatible_states.append(state)
 
 	# return compatible_states
 	return (compatible_components, compatible_ports, compatible_states)

@@ -97,7 +97,7 @@ def gesso(command=None):
 			None
 
 
-	elif args.command == 'assemble':
+	elif args.command == 'compose':
 		assemble(args.component_identifiers)
 
 	elif args.command == 'project': # app
