@@ -1,8 +1,8 @@
 # Gesso 
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/gesso/gesso)
-[![Patreon](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://www.patreon.com/gesso)
-[![License](https://img.shields.io/badge/donate-on%20patreon-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Patreon](https://img.shields.io/badge/donate-on%20patreon-green.svg)](https://www.patreon.com/gesso)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Thank you for checking out Gesso. We're changing Gesso every day as we crank out the [roadmap]() and make tweaks along the way. If you want to help out, learn how to do so in the [contribution](#contribute) section. Thanks for bearing with us :bear:!
 
