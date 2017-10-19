@@ -115,3 +115,9 @@ Session.vim
 *~
 # vim auto-generated tag files
 tags
+
+# macOS
+*/.DS_Store
+
+# Gesso
+.gesso/
