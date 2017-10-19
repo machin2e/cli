@@ -3,6 +3,7 @@ import yaml
 from ..util import util
 from port import Port
 from state import State
+from system import System
 
 class Component(object):
 
@@ -45,25 +46,104 @@ class Component(object):
 
     @staticmethod
     def open(paths):
-            """
-            Reads the model files located at the specified paths and returns a list of
-            model objects.
-            """
-            components = []
-            for path in paths:
-                if path != None:
-                    component_dict = util.load_yaml_file(path)
-                    component = Component(component_dict)
-                    components.append(component)
-            return components
+        """
+        Reads the model files located at the specified paths and returns a list of
+        model objects.
+        """
+        components = []
+        for path in paths:
+            if path != None:
+                component_dict = util.load_yaml_file(path)
+                component = Component(component_dict)
+                components.append(component)
+        return components
 
-    # def compute_port_dependencies(self):
-	# print 'Port Dependencies for %s:' % self.name
-	# for port in self.ports:
-                # port_dependency = port.compute_compatible_state_set()
-                # print '\t%s' % port_dependency
-	# print ''
+    @staticmethod
+    def compose(components):
+        """
+        Determines whether the components can be connected or not.
+        If they can be connected, it searches for valid connections.
+        If a complete, valid set of connections is found, the connections are returned.
+        (The returned connections are used to describe step by step connections + chart.)
+        (The returned connections are written to a file.)
 
+        Parameters
+        ----------
+        components : list of components
+            List of ``Component`` objects to compose into a ``System``.
+
+        Notes
+        -----
+        # route(components)
+        # Pseudocode:
+        # Start with devices that have _only_ a single configuration per port.
+        # - seek power sources
+        # - for a found power source, check if the source also satisfies the other dependencies
+        # - if so, find connections on the device
+        # - if not, continue to next power source candidate...
+        """
+        # TODO: search for compatible device (first look for power source (prioritized dependency satisfaction), then verify other dependencies, perserving interface consistency for multi-port interfaces)
+
+        logger = util.logger(__name__, exclude_prefix=True)
+
+        system = System()
+        system.components.extend(components)
+
+        # TODO: Infer hosts or ask user interactively or store in YAML file
+        hosts = []
+        for component in system.components:
+            if component.host:
+                hosts.append(component)
+
+        paths = []
+        occupied_ports = []
+
+        for component in system.components:
+            if component in hosts:
+                logger.info('Skipping compatibility search for host %s.\n' % component.name)
+                continue
+
+            # THE JOB IS THE FILL THIS ARRAY WITH ALL PORTS FOR THE COMPONENT! IF THEY'RE NOT ALL IN THERE AT THE END OF THIS LOOP, IT IS AN INCOMPLETE INTERFACE.
+            resolved_source_component_ports = []
+
+            # print 'Searching for compatible ports for %s:' % component.name
+            for port in component.ports:
+                compatibility = port.find_compatible_states(system.components, logger)
+
+                # Print the compatible states and corresponding ports (if any).
+                # For components that provide no compatible ports, print 'None'.
+                logger.info('\t\tCompatible Ports:')
+                for compatible_state in port.get_compatible_states():
+                    logger.info("\t\t\t%s: mode: %s, direction: %s, voltage: %s" % (
+                        compatible_state.port.number, compatible_state.mode, compatible_state.direction, compatible_state.voltage))
+
+                    if compatible_state.port not in occupied_ports and port not in resolved_source_component_ports:
+                        occupied_ports.append(compatible_state.port)
+                        resolved_source_component_ports.append(port)
+
+                        path = {
+                            'source_component': port.component,
+                            'source_port': port,
+                            'target_component': compatible_state.port.component,
+                            'target_port': compatible_state.port
+                        }
+
+                        paths.append(path)
+
+            logger.info('')
+
+        print "\nGenerated configuration file with paths in <YAML_FILE_LOCATION>."
+        print "\nGenerated scripts with configured components in <LOCATIONS>. To customize behavior, edit <FILES>."
+
+        print "\nAssembly Instructions:"
+        for path in paths:
+            print 'Connect the component: %s:' % path['source_component'].name
+            print '\tConnect port %s on %s to port %s on %s' % (path['source_port'].number, path['source_component'].name, path['target_port'].number, path['target_component'].name)
+
+        # TODO: add flag "--explain" to explain why certain ports were chosen (based on heuristic).
+        # TODO: Generate list of valid paths.
+        # print 'TODO: Generate step-by-step instructions. Update connections on the fly as connections are made? Sure, but add option for automating.'
+        # print 'TODO: Generate path YAML file.'
 
 """
 device = Component()

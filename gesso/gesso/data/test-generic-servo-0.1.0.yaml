@@ -1,0 +1,57 @@
+# pin : a GPIO lead/connector
+# port : "A GPIO port is a group of GPIO pins (typically 8 GPIO pins) arranged in a group and controlled as a group." (Wikipedia/GPIO)
+# interface
+
+name: Micro Servo
+description: Generic micro servo.
+pins:
+      #label: ground
+    - number: 1
+      enabled: true # can be enabled or disabled
+      states:
+          - mode: [power]
+            direction: [input]
+            voltage: [3.3v] # TODO: Support voltage ranges
+      #states:
+      #    - mode: digital
+      #      direction: output
+      #      voltage: 3.3v
+
+      #power: volts(5)
+      #power: volts(5-10)
+      #power: common
+    - number: 2
+      states:
+          - mode: [pulse-width-modulation] # alt: pwm
+            direction: [input] # alt: in
+            voltage: [3.3v]
+      #label: power
+    - number: 3
+      states:
+          - mode: [power]
+            direction: [bidirectional] # alt: bi
+            voltage: [0v]
+      # power: voltage(3.3v)
+      # power: common
+      #
+      # Can have port: mode, direction, voltage (static assignment)
+      # Can have port: [mode], [direction], [voltage] (one set of constraints)
+      # Can have port: states: - ... (constraints)
+
+ports:
+    - type: uart
+      pins:
+          - number: 1
+            mode: uart(rx)
+            direction: input
+            power: 3.3v
+          - number: 2
+            mode: uart(tx)
+            direction: output
+            power: 3.3v
+
+interfaces:
+    - type: radio
+      protocol: wifi
+    - type: radio
+      protocol: thread
