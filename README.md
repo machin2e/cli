@@ -265,4 +265,6 @@ The API will include interfaces for:
 
 ## Contribute
 
+To jump right in, [join the Waffle board](https://waffle.io/gesso/gesso/join) used to manage the project's development.
+
 If you want to contribute, you might find GitHub's [Open Source Guides](https://opensource.guide/) useful. For example, there's a guide on [code of conduct](https://opensource.guide/code-of-conduct/) for open source projects. The repository for the guides is at ([GitHub](https://github.com/github/opensource.guide#readme)). You can find more about [the anatomy of an open source project](https://opensource.guide/how-to-contribute/#anatomy-of-an-open-source-project) and GitHub's [community profiles](https://help.github.com/articles/viewing-your-community-profile/), too.
