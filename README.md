@@ -3,6 +3,7 @@
 [![Code of Conduct](https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-blue.svg?style=flat)](https://github.com/gesso/gesso/blob/master/CODE_OF_CONDUCT.md)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/gesso/gesso)
 [![Patreon](https://img.shields.io/badge/donate-on%20patreon-green.svg)](https://www.patreon.com/gesso)
+[![Waffle.io - Issues in progress](https://badge.waffle.io/gesso/gesso.png?label=in%20progress&title=In%20Progress)](http://waffle.io/gesso/gesso)
 
 Thank you for checking out Gesso. We're changing Gesso every day as we crank out the [roadmap]() and make tweaks along the way. If you want to help out, learn how to do so in the [contribution](#contribute) section. Thanks for bearing with us :bear:!
 
